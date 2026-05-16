@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#2f3b52" />
+<title>말씀카드 메이커</title>
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" href="icon-192.png" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="말씀카드" />
+<meta name="mobile-web-app-capable" content="yes" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@400;700&family=Nanum+Myeongjo:wght@400;700&family=Gowun+Batang:wght@400;700&family=Nanum+Pen+Script&family=Gaegu:wght@400;700&family=Black+Han+Sans&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#eef1f6; --panel:#ffffff; --ink:#1f2735; --muted:#69728a;
+    --line:#e3e7ef; --brand:#3a6ea5; --brand-d:#2f5780; --accent:#c98a3c;
+    --radius:16px; --shadow:0 10px 30px rgba(31,39,53,.10);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Noto Sans KR",system-ui,-apple-system,"Segoe UI",sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.55;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  header{
+    background:linear-gradient(135deg,#34435f,#2a3850); color:#fff;
+    padding:16px 18px; display:flex; align-items:center; gap:10px;
+  }
+  header .logo{font-size:22px}
+  header h1{font-size:17px;margin:0;font-weight:700;letter-spacing:.3px}
+  header p{margin:0;font-size:12px;color:#c6d0e2}
+  .wrap{max-width:1180px;margin:0 auto;padding:18px;display:grid;gap:18px;
+    grid-template-columns:minmax(0,1fr) minmax(0,440px)}
+  @media(max-width:900px){.wrap{grid-template-columns:1fr;padding:12px}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow)}
+  .preview-col{position:sticky;top:14px;align-self:start}
+  @media(max-width:900px){.preview-col{position:static;order:-1}}
+  .pad{padding:18px}
+  h2.sec{font-size:13px;font-weight:700;color:var(--muted);margin:0 0 12px;
+    text-transform:uppercase;letter-spacing:.12em}
+  label{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
+  textarea,input[type=text],input[type=password],select{
+    width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 12px;
+    font:inherit;color:var(--ink);background:#fbfcfe;outline:none}
+  textarea{min-height:104px;resize:vertical;line-height:1.6}
+  textarea:focus,input:focus,select:focus{border-color:var(--brand);background:#fff}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .tab{flex:1;min-width:84px;text-align:center;padding:9px 6px;border-radius:10px;
+    border:1px solid var(--line);background:#f4f6fa;font-size:13px;font-weight:600;
+    color:var(--muted);cursor:pointer;user-select:none}
+  .tab.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .panel{display:none}
+  .panel.on{display:block}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  .row>*{flex:1;min-width:0}
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{padding:7px 12px;border-radius:999px;border:1px solid var(--line);
+    background:#f4f6fa;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer}
+  .chip.on{background:#eaf1f8;border-color:var(--brand);color:var(--brand-d)}
+  .chips.emoji{gap:6px}
+  .chips.emoji .chip{font-size:22px;padding:6px 9px;line-height:1}
+  .chips.emoji .chip.on{background:#eaf1f8;border-color:var(--brand);transform:scale(1.08)}
+  canvas#cv{touch-action:none}
+  button.btn{appearance:none;border:0;border-radius:11px;padding:12px 14px;
+    font:inherit;font-weight:700;cursor:pointer;background:var(--brand);color:#fff;width:100%}
+  button.btn:active{transform:translateY(1px)}
+  button.btn.alt{background:#eef2f7;color:var(--brand-d)}
+  button.btn.gold{background:linear-gradient(135deg,#c98a3c,#b9762a)}
+  button.btn:disabled{opacity:.55;cursor:not-allowed}
+  .btn-row{display:flex;gap:8px;margin-top:12px}
+  .btn-row .btn{width:auto;flex:1}
+  .hint{font-size:12px;color:var(--muted);margin:6px 0 0}
+  .slider{display:flex;align-items:center;gap:10px}
+  input[type=range]{flex:1;accent-color:var(--brand)}
+  .swatches{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .sw{width:30px;height:30px;border-radius:50%;border:2px solid #fff;
+    box-shadow:0 0 0 1px var(--line);cursor:pointer}
+  .sw.on{box-shadow:0 0 0 2px var(--brand)}
+  .stage{padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px}
+  .canvas-box{width:100%;display:flex;justify-content:center}
+  canvas{max-width:100%;height:auto;border-radius:12px;
+    box-shadow:0 8px 24px rgba(31,39,53,.18);background:#dfe3ec}
+  .status{font-size:12.5px;color:var(--muted);min-height:18px;text-align:center}
+  .status.err{color:#c0392b;font-weight:600}
+  .status.ok{color:#2c7a4b;font-weight:600}
+  details{border:1px dashed var(--line);border-radius:10px;padding:10px 12px;margin-top:14px}
+  details summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--muted)}
+  details .hint{margin-top:8px}
+  .warn{background:#fff7ec;border:1px solid #f0d9b5;color:#8a5a17;
+    font-size:12px;padding:9px 11px;border-radius:9px;margin-top:8px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .spin{display:inline-block;width:14px;height:14px;border:2px solid #cdd5e3;
+    border-top-color:var(--brand);border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px;margin-right:6px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .samples{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+    max-height:430px;overflow:auto;padding:4px 2px}
+  @media(min-width:900px){.samples{grid-template-columns:repeat(4,1fr)}}
+  .samples .thumb{position:relative;border:2px solid transparent;border-radius:10px;
+    overflow:hidden;cursor:pointer;line-height:0;background:#eef1f6}
+  .samples .thumb.on{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand)}
+  .samples .thumb span{position:absolute;left:5px;bottom:4px;font-size:10px;
+    color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.7);line-height:1.2}
+  .samples canvas{width:100%;height:auto;display:block}
+  footer{text-align:center;color:var(--muted);font-size:12px;padding:8px 0 24px}
+</style>
+</head>
+<body>
+<header>
+  <span class="logo">📖</span>
+  <div>
+    <h1>말씀카드 메이커</h1>
+    <p>글귀 + 사진 → 한 장의 카드. 무료 · 설치 없음</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- ===== 편집 패널 ===== -->
+  <section class="card pad">
+    <div class="tabs">
+      <div class="tab on" data-tab="text">① 글귀</div>
+      <div class="tab" data-tab="bg">② 배경</div>
+      <div class="tab" data-tab="design">③ 디자인</div>
+      <div class="tab" data-tab="deco">④ 캐릭터</div>
+    </div>
+
+    <!-- 글귀 -->
+    <div class="panel on" data-panel="text">
+      <h2 class="sec">성경 구절</h2>
+      <label>번역본</label>
+      <select id="bibleVer">
+        <option value="kor_rev">개역개정 (참조만 자동 · 본문 직접입력)</option>
+        <option value="kor_easy">쉬운성경 (참조만 자동 · 본문 직접입력)</option>
+        <option value="niv">NIV (참조만 자동 · 본문 직접입력)</option>
+        <option value="kor_hangul">개역한글 (무료 · 본문 자동)</option>
+        <option value="web">WEB 영문 (무료 · 본문 자동)</option>
+        <option value="kjv">KJV 영문 (무료 · 본문 자동)</option>
+      </select>
+      <label>구절 선택</label>
+      <div class="row">
+        <select id="bibleRef" style="flex:1"></select>
+        <button class="btn" id="bibleFetch" style="flex:0 0 104px">구절 넣기</button>
+      </div>
+      <p class="hint">개역개정·NIV·쉬운성경은 저작권 보호로 본문 자동 불러오기가 불가합니다 → ‘참조’만 자동 입력되니 성경에서 본문을 붙여넣어 주세요. 개역한글·WEB·KJV는 본문까지 자동으로 채워집니다.</p>
+
+      <h2 class="sec" style="margin-top:20px">글귀 입력</h2>
+      <label>본문 (말씀 · 시 · 명언)</label>
+      <textarea id="mainText" placeholder="예) 수고하고 무거운 짐 진 자들아&#10;다 내게로 오라 내가 너희를 쉬게 하리라"></textarea>
+      <label>출처 · 저자 (선택)</label>
+      <input type="text" id="refText" placeholder="예) 마태복음 11:28 / 윤동주" />
+      <p class="hint">줄바꿈은 Enter 로 입력합니다. 글자 크기는 자동으로 맞춰지며 ③ 디자인에서 조절할 수 있어요.</p>
+    </div>
+
+    <!-- 배경 -->
+    <div class="panel" data-panel="bg">
+      <h2 class="sec">배경 이미지</h2>
+      <div class="tabs" id="srcTabs">
+        <div class="tab on" data-src="sample">샘플 30</div>
+        <div class="tab" data-src="ai">무료 AI</div>
+        <div class="tab" data-src="upload">내 사진</div>
+        <div class="tab" data-src="search">사진검색</div>
+        <div class="tab" data-src="pro">DALL·E/Gemini</div>
+      </div>
+
+      <!-- 샘플 배경 30 -->
+      <div class="panel on" data-src-panel="sample">
+        <label>말씀카드용 배경 (탭하면 적용)</label>
+        <div class="samples" id="sampleGrid"></div>
+        <p class="hint">앱이 직접 그려내는 30가지 배경 — 인터넷 없이도 즉시 적용되고, 비율을 바꾸면 자동으로 다시 맞춰집니다.</p>
+      </div>
+
+      <!-- 무료 AI -->
+      <div class="panel" data-src-panel="ai">
+        <label>분위기</label>
+        <div class="chips" id="moodChips">
+          <span class="chip on" data-mood="nature">잔잔한 자연</span>
+          <span class="chip" data-mood="light">빛 · 하늘</span>
+          <span class="chip" data-mood="water">수채화</span>
+          <span class="chip" data-mood="photo">사진 느낌(실사)</span>
+          <span class="chip" data-mood="minimal">미니멀</span>
+          <span class="chip" data-mood="warm">따뜻한 톤</span>
+        </div>
+        <label>그림 설명 (자동 작성됨 · 수정 가능)</label>
+        <textarea id="aiPrompt" style="min-height:70px" placeholder="배경으로 그릴 장면을 적어주세요"></textarea>
+        <div class="btn-row">
+          <button class="btn" id="aiGen">AI 그림 생성</button>
+          <button class="btn alt" id="aiReroll" style="flex:.6">다시</button>
+        </div>
+        <p class="hint">가입·API키·비용 없이 바로 생성됩니다 (Pollinations.ai). 글자는 그림에 넣지 않고, 카드에서 합성됩니다.</p>
+      </div>
+
+      <!-- 내 사진 -->
+      <div class="panel" data-src-panel="upload">
+        <label>휴대폰 / PC 에서 사진 선택</label>
+        <input type="file" id="fileInput" accept="image/*" />
+        <p class="hint">휴대폰에서는 촬영 또는 갤러리에서 선택할 수 있습니다. 업로드 사진은 항상 저장이 잘 됩니다.</p>
+      </div>
+
+      <!-- 사진 검색 -->
+      <div class="panel" data-src-panel="search">
+        <label>키워드로 무료 사진 검색</label>
+        <div class="row">
+          <input type="text" id="searchQ" placeholder="예) 바다, 노을, 산, 들꽃, 빛" />
+          <button class="btn" id="searchBtn" style="flex:0 0 90px">검색</button>
+        </div>
+        <div class="btn-row">
+          <button class="btn alt" id="searchPrev" disabled>◀ 이전</button>
+          <button class="btn alt" id="searchNext" disabled>다음 ▶</button>
+        </div>
+        <button class="btn alt" id="hqBtn" style="margin-top:8px">✨ 고화질 추천 사진 (검색어 없이)</button>
+        <p class="hint">위키미디어 + Openverse(플리커·박물관 등) 무료 사진을 함께 검색합니다. 키 불필요·다운로드 안전. 결과가 적으면 ‘고화질 추천’으로 예쁜 풍경 사진을 받아보세요.</p>
+      </div>
+
+      <!-- 고급(키 입력) -->
+      <div class="panel" data-src-panel="pro">
+        <div class="warn">⚠️ <b>나노바나나(Gemini) 권장</b> — 브라우저에서 바로 동작합니다. <b>DALL·E(OpenAI)</b>는 브라우저 직접 호출을 OpenAI가 차단하므로, 파일을 그냥 열어 쓰면 키가 맞아도 실패합니다(웹서버 배포 시에만 가능). API 키는 이 브라우저에만 저장됩니다 — 공용 PC에서는 사용 후 "키 지우기"를 눌러주세요.</div>
+        <label>엔진</label>
+        <select id="proEngine">
+          <option value="gemini">나노바나나 — Google Gemini 2.5 Flash Image</option>
+          <option value="openai">DALL·E — OpenAI (gpt-image-1)</option>
+        </select>
+        <label>API 키</label>
+        <input type="password" id="proKey" placeholder="발급받은 API 키를 붙여넣기" />
+        <label>그림 설명</label>
+        <textarea id="proPrompt" style="min-height:70px" placeholder="그릴 장면 설명 (③ 글귀에서 자동 채워짐)"></textarea>
+        <div class="btn-row">
+          <button class="btn gold" id="proGen">고급 엔진으로 생성</button>
+          <button class="btn alt" id="proClear" style="flex:.5">키 지우기</button>
+        </div>
+        <p class="hint">키 발급 — 나노바나나: aistudio.google.com → "Get API key" (무료). DALL·E: platform.openai.com → API keys(결제 등록 필요, 브라우저 직접 호출 불가). 키 입력 후 "고급 엔진으로 생성"을 누르세요. 실패 시 화면 하단에 정확한 원인이 표시됩니다.</p>
+      </div>
+    </div>
+
+    <!-- 디자인 -->
+    <div class="panel" data-panel="design">
+      <h2 class="sec">스타일 & 비율</h2>
+      <label>스타일</label>
+      <div class="chips" id="styleChips">
+        <span class="chip on" data-style="classic">단아한 정통</span>
+        <span class="chip" data-style="modern">모던 감성</span>
+        <span class="chip" data-style="frame">카드 / 액자</span>
+      </div>
+      <label>비율</label>
+      <div class="chips" id="ratioChips">
+        <span class="chip on" data-ratio="1:1">정사각 1:1</span>
+        <span class="chip" data-ratio="4:5">피드 4:5</span>
+        <span class="chip" data-ratio="9:16">스토리 9:16</span>
+        <span class="chip" data-ratio="a4">A4 인쇄</span>
+      </div>
+
+      <label>글꼴</label>
+      <select id="fontSel">
+        <option value="Noto Serif KR">본명조 (Noto Serif KR)</option>
+        <option value="Nanum Myeongjo">나눔명조</option>
+        <option value="Gowun Batang">고운바탕</option>
+        <option value="Noto Sans KR">본고딕 (Noto Sans KR)</option>
+        <option value="Black Han Sans">검은고딕 (굵은 제목)</option>
+        <option value="Gaegu">개구 (손글씨)</option>
+        <option value="Nanum Pen Script">나눔손글씨 펜</option>
+      </select>
+
+      <div class="grid2" style="margin-top:14px">
+        <div>
+          <label style="margin-top:0">글자 크기</label>
+          <div class="slider"><input type="range" id="sizeR" min="60" max="170" value="100" /></div>
+        </div>
+        <div>
+          <label style="margin-top:0">세로 위치</label>
+          <div class="slider"><input type="range" id="posR" min="0" max="100" value="62" /></div>
+        </div>
+      </div>
+
+      <label>글자색</label>
+      <div class="swatches" id="colorSw">
+        <span class="sw on" data-color="#ffffff" style="background:#fff"></span>
+        <span class="sw" data-color="#f4ead2" style="background:#f4ead2"></span>
+        <span class="sw" data-color="#1d2330" style="background:#1d2330"></span>
+        <span class="sw" data-color="#7a3b2e" style="background:#7a3b2e"></span>
+        <input type="color" id="colorPick" value="#ffffff" style="width:38px;height:32px;padding:0;border:none;background:none;cursor:pointer" />
+      </div>
+
+      <div class="grid2" style="margin-top:14px">
+        <div>
+          <label style="margin-top:0">배경 어둡게</label>
+          <div class="slider"><input type="range" id="overR" min="0" max="80" value="38" /></div>
+        </div>
+        <div>
+          <label style="margin-top:0">배경 흐림</label>
+          <div class="slider"><input type="range" id="blurR" min="0" max="14" value="0" /></div>
+        </div>
+      </div>
+
+      <label>정렬</label>
+      <div class="chips" id="alignChips">
+        <span class="chip on" data-align="center">가운데</span>
+        <span class="chip" data-align="left">왼쪽</span>
+      </div>
+
+      <details>
+        <summary>저장된 설정 / 키 관리</summary>
+        <p class="hint">입력값·설정·API 키는 이 기기 브라우저에만 자동 저장됩니다.</p>
+        <button class="btn alt" id="resetAll" style="margin-top:8px">모두 초기화</button>
+      </details>
+    </div>
+
+    <!-- 캐릭터 / 스티커 -->
+    <div class="panel" data-panel="deco">
+      <h2 class="sec">귀여운 동물</h2>
+      <div class="chips emoji" id="animalChips"></div>
+      <h2 class="sec" style="margin-top:18px">성경 · 믿음 상징</h2>
+      <div class="chips emoji" id="bibleChips"></div>
+      <div class="btn-row">
+        <button class="btn alt" id="stkClear">캐릭터 빼기</button>
+      </div>
+      <div class="grid2" style="margin-top:14px">
+        <div>
+          <label style="margin-top:0">크기</label>
+          <div class="slider"><input type="range" id="stkSizeR" min="5" max="40" value="14" /></div>
+        </div>
+        <div>
+          <label style="margin-top:0">좌우 위치</label>
+          <div class="slider"><input type="range" id="stkXR" min="0" max="100" value="50" /></div>
+        </div>
+      </div>
+      <label>상하 위치</label>
+      <div class="slider"><input type="range" id="stkYR" min="0" max="100" value="80" /></div>
+      <p class="hint">캐릭터를 탭하면 카드에 추가됩니다. <b>미리보기 화면에서 손가락/마우스로 끌어 옮길 수</b> 있어요. 크기·위치 슬라이더로도 조절 가능합니다.</p>
+    </div>
+  </section>
+
+  <!-- ===== 미리보기 ===== -->
+  <section class="preview-col">
+    <div class="card">
+      <div class="stage">
+        <div class="canvas-box"><canvas id="cv" width="1080" height="1080"></canvas></div>
+        <div class="status" id="status">글귀와 배경을 넣어 카드를 만들어 보세요.</div>
+        <div class="btn-row" style="width:100%">
+          <button class="btn" id="dlBtn">PNG 저장</button>
+          <button class="btn alt" id="shareBtn">공유</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<footer>말씀카드 메이커 · 모든 처리는 내 브라우저에서 이루어집니다</footer>
+
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const cv = $("#cv"), ctx = cv.getContext("2d");
+
+const RATIOS = { "1:1":[1080,1080], "4:5":[1080,1350], "9:16":[1080,1920], "a4":[1080,1527] };
+const MOODS = {
+  nature:"평화로운 자연 풍경, 부드러운 햇빛, 잔잔하고 고요한 분위기",
+  light:"빛이 스며드는 하늘과 구름, 은은한 광선, 희망적인 분위기",
+  water:"부드러운 수채화 느낌의 추상 배경, 파스텔 색감",
+  photo:"사실적인 사진, 얕은 심도, 자연광, 고요한 풍경",
+  minimal:"미니멀한 단색 배경, 여백이 많은 깔끔한 구성",
+  warm:"따뜻한 황금빛 톤, 노을빛, 포근한 분위기"
+};
+const STYLE_EN = "cinematic, soft natural light, calm, serene, high quality, no text, no letters, no watermark, no people faces close-up";
+// 글꼴별 실제 제공 굵기 (구글폰트 기준). 없는 굵기를 쓰면 한글이 깨지므로 여기서만 선택
+const FONTS = {
+  "Noto Serif KR":[400,700],
+  "Nanum Myeongjo":[400,700],
+  "Gowun Batang":[400,700],
+  "Noto Sans KR":[400,700],
+  "Black Han Sans":[400],
+  "Gaegu":[400,700],
+  "Nanum Pen Script":[400]
+};
+
+let state = {
+  tab:"text", src:"sample", mood:"nature", style:"classic", ratio:"1:1",
+  font:"Noto Serif KR", size:100, pos:62, color:"#ffffff",
+  over:38, blur:0, align:"center",
+  searchList:[], searchIdx:0,
+  proEngine:"gemini", preset:null,
+  sticker:"", stkX:50, stkY:80, stkSize:14
+};
+let bgImg = null;          // 로드 완료된 Image 객체
+let lastObjectURL = null;
+
+/* ---------- 저장/복원 ---------- */
+const LS = "wordcard-state-v1";
+function save(){
+  try{
+    localStorage.setItem(LS, JSON.stringify({
+      state, mainText:$("#mainText").value, refText:$("#refText").value,
+      aiPrompt:$("#aiPrompt").value, proKey:$("#proKey").value,
+      proPrompt:$("#proPrompt").value,
+      bibleVer:$("#bibleVer").value, bibleRef:$("#bibleRef").value
+    }));
+  }catch(e){}
+}
+function restore(){
+  try{
+    const d = JSON.parse(localStorage.getItem(LS)||"{}");
+    if(d.state) Object.assign(state, d.state);
+    if(d.mainText) $("#mainText").value = d.mainText;
+    if(d.refText) $("#refText").value = d.refText;
+    if(d.proKey) $("#proKey").value = d.proKey;
+    if(d.proPrompt) $("#proPrompt").value = d.proPrompt;
+    if(d.bibleVer) $("#bibleVer").value = d.bibleVer;
+    if(d.bibleRef!=null && $("#bibleRef").querySelector(`option[value="${d.bibleRef}"]`)) $("#bibleRef").value = d.bibleRef;
+    syncUI();
+  }catch(e){}
+}
+function syncUI(){
+  $("#fontSel").value = state.font;
+  $("#proEngine").value = state.proEngine;
+  $("#sizeR").value = state.size; $("#posR").value = state.pos;
+  $("#overR").value = state.over; $("#blurR").value = state.blur;
+  $("#colorPick").value = /^#[0-9a-f]{6}$/i.test(state.color)? state.color : "#ffffff";
+  setActive("#styleChips",".chip","data-style",state.style);
+  setActive("#ratioChips",".chip","data-ratio",state.ratio);
+  setActive("#moodChips",".chip","data-mood",state.mood);
+  setActive("#alignChips",".chip","data-align",state.align);
+  $$("#colorSw .sw").forEach(s=>s.classList.toggle("on",s.dataset.color===state.color));
+  syncDeco();
+  showTab(state.tab); showSrc(state.src);
+}
+function setActive(wrap,sel,attr,val){
+  $$(wrap+" "+sel).forEach(el=>el.classList.toggle("on", el.getAttribute(attr)===val));
+}
+
+/* ---------- 탭 전환 ---------- */
+function showTab(t){
+  state.tab=t;
+  $$(".tabs .tab[data-tab]").forEach(x=>x.classList.toggle("on",x.dataset.tab===t));
+  $$(".panel[data-panel]").forEach(p=>p.classList.toggle("on",p.dataset.panel===t));
+}
+function showSrc(s){
+  state.src=s;
+  $$("#srcTabs .tab").forEach(x=>x.classList.toggle("on",x.dataset.src===s));
+  $$(".panel[data-src-panel]").forEach(p=>p.classList.toggle("on",p.dataset.srcPanel===s));
+}
+$$(".tabs .tab[data-tab]").forEach(t=>t.onclick=()=>{showTab(t.dataset.tab);save();});
+$$("#srcTabs .tab").forEach(t=>t.onclick=()=>{showSrc(t.dataset.src);save();});
+
+/* ---------- 칩/스와치 ---------- */
+function chipGroup(wrap,attr,key,after){
+  $$(wrap+" .chip").forEach(c=>c.onclick=()=>{
+    state[key]=c.getAttribute(attr);
+    setActive(wrap,".chip",attr,state[key]);
+    if(after) after();
+    save(); render();
+  });
+}
+chipGroup("#styleChips","data-style","style");
+chipGroup("#ratioChips","data-ratio","ratio",()=>{ if(state.preset!=null) applyPreset(state.preset); else if(bgImg) needRefit=true; });
+chipGroup("#alignChips","data-align","align");
+chipGroup("#moodChips","data-mood","mood",buildAIPrompt);
+$$("#colorSw .sw").forEach(s=>s.onclick=()=>{
+  state.color=s.dataset.color; $("#colorPick").value=s.dataset.color;
+  $$("#colorSw .sw").forEach(x=>x.classList.toggle("on",x===s));
+  save(); render();
+});
+$("#colorPick").oninput=e=>{
+  state.color=e.target.value;
+  $$("#colorSw .sw").forEach(x=>x.classList.remove("on"));
+  save(); render();
+};
+
+/* ---------- 슬라이더/입력 ---------- */
+const bind=(id,key)=>$(id).oninput=e=>{ state[key]=+e.target.value; save(); render(); };
+bind("#sizeR","size"); bind("#posR","pos"); bind("#overR","over"); bind("#blurR","blur");
+$("#fontSel").onchange=e=>{ state.font=e.target.value; save(); render(); };
+$("#proEngine").onchange=e=>{ state.proEngine=e.target.value; save(); };
+["#mainText","#refText"].forEach(id=>$(id).oninput=()=>{ save(); render(); });
+$("#aiPrompt").oninput=save; $("#proPrompt").oninput=save; $("#proKey").oninput=save;
+
+/* ---------- 상태표시 ---------- */
+function status(msg,type=""){ const s=$("#status"); s.className="status "+type; s.innerHTML=msg; }
+
+/* ---------- AI 프롬프트 자동 작성 ---------- */
+function buildAIPrompt(){
+  const verse=($("#mainText").value||"").trim().slice(0,90);
+  const p=`${MOODS[state.mood]||""}. ${STYLE_EN}`;
+  $("#aiPrompt").value=p;
+  if(!$("#proPrompt").value.trim()) $("#proPrompt").value=p;
+  save();
+}
+
+/* ---------- 이미지 로더 ---------- */
+function loadImage(url,{cross=true}={}){
+  return new Promise((res,rej)=>{
+    const im=new Image();
+    if(cross) im.crossOrigin="anonymous";
+    im.onload=()=>res(im);
+    im.onerror=()=>rej(new Error("이미지를 불러오지 못했습니다."));
+    im.src=url;
+  });
+}
+function setBg(img,isPreset){ bgImg=img; if(!isPreset) state.preset=null; needRefit=true; render(); }
+
+/* ================= 샘플 배경 30종 (앱이 직접 그림) ================= */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const PRESETS=[
+  {n:"새벽하늘",t:"lin",c:["#1b2a4a","#3a5a8c","#cf9b6d"]},
+  {n:"일출",t:"lin",c:["#f6c177","#ef8a5a","#7a3b6b"]},
+  {n:"황금들녘",t:"lin",c:["#fceabb","#f6b94f","#c77f2e"]},
+  {n:"호숫가 아침",t:"lin",c:["#cfe8f3","#8fb8d6","#3f6f96"]},
+  {n:"라벤더",t:"lin",c:["#efe3f5","#c9b3e6","#7d6bb0"]},
+  {n:"세이지 그린",t:"lin",c:["#e7efe1","#aec9a4","#5d7e57"]},
+  {n:"노을 바다",t:"lin",c:["#ffd9a0","#ff9e6d","#3b4a78"]},
+  {n:"미드나잇",t:"lin",c:["#0b1224","#1c2b4a","#2f4673"]},
+  {n:"크림 베이지",t:"lin",c:["#fbf3e6","#efe1c8","#d8c4a0"]},
+  {n:"장미빛",t:"lin",c:["#fde7ec","#f3b8c6","#b5708a"]},
+  {n:"천상의 빛",t:"rad",c:["#10203a","#1d3556"],gl:"rgba(255,238,200,.85)",cy:.30},
+  {n:"은혜의 광채",t:"rad",c:["#2a1c3a","#4a2f63"],gl:"rgba(214,179,255,.70)",cy:.32},
+  {n:"따뜻한 후광",t:"rad",c:["#3a2a1c","#6b4a2f"],gl:"rgba(255,209,150,.80)",cy:.34},
+  {n:"새벽 여명",t:"rad",c:["#102a3a","#23566b"],gl:"rgba(180,230,240,.60)",cy:.70},
+  {n:"평온한 빛",t:"rad",c:["#1c2a24","#34503f"],gl:"rgba(200,240,210,.60)",cy:.30},
+  {n:"숲속 햇살",t:"ray",c:["#16361f","#2f6b3f"],ray:"#eaffcf",cx:.5,cy:-.05},
+  {n:"황금빛 줄기",t:"ray",c:["#3a2a10","#6b4a1f"],ray:"#ffe6b0",cx:.42,cy:-.06},
+  {n:"천국의 문",t:"ray",c:["#0e1c3a","#21407a"],ray:"#dce8ff",cx:.5,cy:-.08},
+  {n:"새 아침",t:"ray",c:["#2a1230","#7a3b5a"],ray:"#ffd9c0",cx:.7,cy:-.05},
+  {n:"소망의 빛",t:"ray",c:["#102a2a","#1f5a55"],ray:"#cffaf0",cx:.3,cy:-.05},
+  {n:"따뜻한 보케",t:"bok",c:["#2a1810","#5a3420"],dot:"rgba(255,200,130,.9)"},
+  {n:"푸른 보케",t:"bok",c:["#0c1a2e","#1d3a5a"],dot:"rgba(150,210,255,.9)"},
+  {n:"금빛 입자",t:"bok",c:["#1c1408","#4a3410"],dot:"rgba(255,224,150,.95)"},
+  {n:"별 밤",t:"bok",c:["#070c1a","#121d3a"],dot:"rgba(255,255,255,.95)",sm:1},
+  {n:"분홍 보케",t:"bok",c:["#2a1020","#5a2444"],dot:"rgba(255,180,210,.9)"},
+  {n:"푸른 수채",t:"wash",c:["#eef5fb","#dfeaf5"],blob:["#9cc4e6","#bcd7ee","#7fa8cf"]},
+  {n:"복숭아 수채",t:"wash",c:["#fdf3ec","#f9e6da"],blob:["#f4b89a","#f6cdb5","#e89e7e"]},
+  {n:"연보라 수채",t:"wash",c:["#f4eefb","#e8def5"],blob:["#c5aee0","#d8c6ee","#b196d2"]},
+  {n:"크림 종이",t:"paper",bg:"#f6efe0",vig:.16},
+  {n:"양피지",t:"paper",bg:"#efe2c6",vig:.22}
+];
+function paintPreset(g,W,H,p,idx){
+  const rnd=mulberry32((idx+1)*9973);
+  if(p.t!=="paper"){
+    const grd=g.createLinearGradient(0,0,0,H);
+    p.c.forEach((c,i)=>grd.addColorStop(i/(p.c.length-1),c));
+    g.fillStyle=grd; g.fillRect(0,0,W,H);
+  }
+  if(p.t==="rad"){
+    const cx=W*.5, cy=H*(p.cy||.3), R=Math.max(W,H)*.95;
+    const rg=g.createRadialGradient(cx,cy,0,cx,cy,R);
+    rg.addColorStop(0,p.gl); rg.addColorStop(.55,p.gl.replace(/[\d.]+\)$/,"0.12)")); rg.addColorStop(1,"rgba(0,0,0,0)");
+    g.fillStyle=rg; g.fillRect(0,0,W,H);
+  }
+  if(p.t==="ray"){
+    const cx=W*(p.cx||.5), cy=H*(p.cy||-.05);
+    g.save(); g.globalCompositeOperation="lighter";
+    for(let i=0;i<16;i++){
+      const a=(-.6+i/15*1.2)*Math.PI*0.5;
+      g.beginPath(); g.moveTo(cx,cy);
+      g.lineTo(cx+Math.sin(a-0.035)*H*1.9, cy+Math.cos(a-0.035)*H*1.9);
+      g.lineTo(cx+Math.sin(a+0.035)*H*1.9, cy+Math.cos(a+0.035)*H*1.9);
+      g.closePath(); g.globalAlpha=0.05; g.fillStyle=p.ray; g.fill();
+    }
+    g.restore();
+  }
+  if(p.t==="bok"){
+    g.save();
+    const n=p.sm?70:26;
+    for(let i=0;i<n;i++){
+      const x=rnd()*W, y=rnd()*H, r=(p.sm?0.004+rnd()*0.012:0.02+rnd()*0.08)*W;
+      const rg=g.createRadialGradient(x,y,0,x,y,r);
+      rg.addColorStop(0,p.dot); rg.addColorStop(1,"rgba(0,0,0,0)");
+      g.globalAlpha=p.sm?(0.4+rnd()*0.6):(0.18+rnd()*0.35);
+      g.fillStyle=rg; g.beginPath(); g.arc(x,y,r,0,7); g.fill();
+    }
+    g.restore();
+  }
+  if(p.t==="wash"){
+    g.save(); g.filter="blur("+Math.max(8,Math.round(W*0.05))+"px)";
+    for(let i=0;i<6;i++){
+      g.fillStyle=p.blob[i%p.blob.length];
+      g.globalAlpha=0.45;
+      g.beginPath(); g.arc(rnd()*W, rnd()*H, (0.22+rnd()*0.26)*W, 0,7); g.fill();
+    }
+    g.restore();
+  }
+  if(p.t==="paper"){
+    g.fillStyle=p.bg; g.fillRect(0,0,W,H);
+    g.save();
+    const dots=Math.round(W*H/2400);
+    for(let i=0;i<dots;i++){
+      g.globalAlpha=0.025+rnd()*0.05; g.fillStyle=rnd()<0.5?"#000":"#fff";
+      const s=1+rnd()*2; g.fillRect(rnd()*W,rnd()*H,s,s);
+    }
+    g.restore();
+  }
+  const vg=g.createRadialGradient(W/2,H/2,Math.min(W,H)*0.32,W/2,H/2,Math.max(W,H)*0.78);
+  vg.addColorStop(0,"rgba(0,0,0,0)"); vg.addColorStop(1,`rgba(0,0,0,${p.vig||0.26})`);
+  g.fillStyle=vg; g.fillRect(0,0,W,H);
+}
+function buildSampleGrid(){
+  const grid=$("#sampleGrid"); if(!grid||grid.childElementCount) return;
+  PRESETS.forEach((p,idx)=>{
+    const d=document.createElement("div"); d.className="thumb"; d.dataset.idx=idx;
+    const c=document.createElement("canvas"); c.width=180; c.height=234;
+    paintPreset(c.getContext("2d"),180,234,p,idx);
+    const lab=document.createElement("span"); lab.textContent=p.n;
+    d.appendChild(c); d.appendChild(lab);
+    d.onclick=()=>applyPreset(idx);
+    grid.appendChild(d);
+  });
+}
+function markSample(idx){
+  $$("#sampleGrid .thumb").forEach(t=>t.classList.toggle("on",+t.dataset.idx===idx));
+}
+function applyPreset(idx){
+  state.preset=idx;
+  const [W,H]=RATIOS[state.ratio];
+  const oc=document.createElement("canvas"); oc.width=W; oc.height=H;
+  paintPreset(oc.getContext("2d"),W,H,PRESETS[idx],idx);
+  setBg(oc,true); markSample(idx);
+  status(`샘플 배경 "${PRESETS[idx].n}" 적용`,"ok");
+  save();
+}
+
+/* ================= 성경 구절 ================= */
+// label: 한글 표기, bk: 책 번호(1~66), ch: 장, v1~v2: 절 범위, en: bible-api 영문 참조
+const REFS=[
+  {label:"요한복음 3:16",bk:43,ch:3,v1:16,v2:16,en:"john 3:16"},
+  {label:"시편 23:1-4",bk:19,ch:23,v1:1,v2:4,en:"psalm 23:1-4"},
+  {label:"빌립보서 4:13",bk:50,ch:4,v1:13,v2:13,en:"philippians 4:13"},
+  {label:"빌립보서 4:6-7",bk:50,ch:4,v1:6,v2:7,en:"philippians 4:6-7"},
+  {label:"마태복음 11:28",bk:40,ch:11,v1:28,v2:28,en:"matthew 11:28"},
+  {label:"마태복음 6:33",bk:40,ch:6,v1:33,v2:33,en:"matthew 6:33"},
+  {label:"이사야 41:10",bk:23,ch:41,v1:10,v2:10,en:"isaiah 41:10"},
+  {label:"잠언 3:5-6",bk:20,ch:3,v1:5,v2:6,en:"proverbs 3:5-6"},
+  {label:"여호수아 1:9",bk:6,ch:1,v1:9,v2:9,en:"joshua 1:9"},
+  {label:"시편 46:1",bk:19,ch:46,v1:1,v2:1,en:"psalm 46:1"},
+  {label:"로마서 8:28",bk:45,ch:8,v1:28,v2:28,en:"romans 8:28"},
+  {label:"예레미야 29:11",bk:24,ch:29,v1:11,v2:11,en:"jeremiah 29:11"},
+  {label:"고린도전서 13:4-7",bk:46,ch:13,v1:4,v2:7,en:"1 corinthians 13:4-7"},
+  {label:"시편 119:105",bk:19,ch:119,v1:105,v2:105,en:"psalm 119:105"},
+  {label:"갈라디아서 2:20",bk:48,ch:2,v1:20,v2:20,en:"galatians 2:20"},
+  {label:"베드로전서 5:7",bk:60,ch:5,v1:7,v2:7,en:"1 peter 5:7"},
+  {label:"이사야 40:31",bk:23,ch:40,v1:31,v2:31,en:"isaiah 40:31"},
+  {label:"시편 27:1",bk:19,ch:27,v1:1,v2:1,en:"psalm 27:1"},
+  {label:"빌립보서 4:19",bk:50,ch:4,v1:19,v2:19,en:"philippians 4:19"},
+  {label:"마태복음 28:20",bk:40,ch:28,v1:20,v2:20,en:"matthew 28:20"},
+  {label:"요한복음 14:6",bk:43,ch:14,v1:6,v2:6,en:"john 14:6"},
+  {label:"시편 121:1-2",bk:19,ch:121,v1:1,v2:2,en:"psalm 121:1-2"},
+  {label:"히브리서 11:1",bk:58,ch:11,v1:1,v2:1,en:"hebrews 11:1"},
+  {label:"로마서 12:2",bk:45,ch:12,v1:2,v2:2,en:"romans 12:2"},
+  {label:"에베소서 2:8",bk:49,ch:2,v1:8,v2:8,en:"ephesians 2:8"},
+  {label:"시편 37:4",bk:19,ch:37,v1:4,v2:4,en:"psalm 37:4"},
+  {label:"데살로니가전서 5:16-18",bk:52,ch:5,v1:16,v2:18,en:"1 thessalonians 5:16-18"},
+  {label:"야고보서 1:5",bk:59,ch:1,v1:5,v2:5,en:"james 1:5"},
+  {label:"요한일서 4:7",bk:62,ch:4,v1:7,v2:7,en:"1 john 4:7"},
+  {label:"마태복음 5:16",bk:40,ch:5,v1:16,v2:16,en:"matthew 5:16"},
+  {label:"잠언 16:3",bk:20,ch:16,v1:3,v2:3,en:"proverbs 16:3"},
+  {label:"디모데후서 1:7",bk:55,ch:1,v1:7,v2:7,en:"2 timothy 1:7"},
+  {label:"시편 91:1-2",bk:19,ch:91,v1:1,v2:2,en:"psalm 91:1-2"},
+  {label:"미가 6:8",bk:33,ch:6,v1:8,v2:8,en:"micah 6:8"},
+  {label:"시편 16:11",bk:19,ch:16,v1:11,v2:11,en:"psalm 16:11"},
+  {label:"요한복음 8:12",bk:43,ch:8,v1:12,v2:12,en:"john 8:12"}
+];
+const VER_NAME={kor_rev:"개역개정",kor_easy:"쉬운성경",niv:"NIV",kor_hangul:"개역한글",web:"WEB",kjv:"KJV"};
+function buildBibleRefs(){
+  const sel=$("#bibleRef"); if(!sel||sel.childElementCount) return;
+  REFS.forEach((r,i)=>{
+    const o=document.createElement("option"); o.value=i; o.textContent=r.label;
+    sel.appendChild(o);
+  });
+}
+async function fetchVerse(){
+  const ver=$("#bibleVer").value;
+  const ref=REFS[+$("#bibleRef").value]; if(!ref) return;
+  const tag=`${ref.label} (${VER_NAME[ver]})`;
+  if(ver==="kor_rev"||ver==="kor_easy"||ver==="niv"){
+    $("#refText").value=tag;
+    status(`${VER_NAME[ver]}은(는) 저작권 보호로 본문 자동 불러오기가 불가합니다. 성경에서 본문을 직접 붙여넣어 주세요. (참조는 자동 입력됨)`,"err");
+    $("#mainText").focus(); save(); render(); return;
+  }
+  status('<span class="spin"></span>구절 불러오는 중…');
+  try{
+    let text="";
+    if(ver==="kor_hangul"){
+      const r=await fetch(`https://api.getbible.net/v2/korean/${ref.bk}/${ref.ch}.json`);
+      if(!r.ok) throw new Error("api");
+      const j=await r.json();
+      const src=j.verses||j.chapter||j.data||{};
+      const all=Array.isArray(src)?src:Object.values(src);
+      const vs=all.filter(x=>x&&x.text!=null&&+x.verse>=ref.v1&&+x.verse<=ref.v2);
+      text=vs.map(x=>String(x.text).trim()).join(" ");
+    }else{
+      const r=await fetch(`https://bible-api.com/${encodeURIComponent(ref.en)}?translation=${ver}&verse_numbers=false`);
+      if(!r.ok) throw new Error("api");
+      const j=await r.json();
+      text=(j.text||"").trim();
+    }
+    text=text.replace(/\s+/g," ").trim();
+    if(!text) throw new Error("empty");
+    $("#mainText").value=text;
+    $("#refText").value=tag;
+    status("구절을 불러왔습니다.","ok");
+    save(); render();
+  }catch(e){
+    $("#refText").value=tag;
+    status("구절을 불러오지 못했습니다(네트워크). 잠시 후 다시 시도하거나 본문을 직접 입력해 주세요.","err");
+    save(); render();
+  }
+}
+$("#bibleFetch").onclick=fetchVerse;
+$("#bibleVer").onchange=save;
+$("#bibleRef").onchange=save;
+
+/* ---------- 캐릭터 / 스티커 ---------- */
+const ANIMALS=["🐑","🐶","🐱","🐰","🐻","🐼","🦊","🐥","🐤","🐧","🦉","🦋","🐝","🐞","🐢","🐠","🐟","🐳","🐋","🦌","🐘","🦒","🐨","🦁","🐦","🐇","🦢","🐹"];
+const BIBLE_E=["🕊️","✝️","⛪","📖","📜","🙏","👼","🐑","🐟","🍞","🍇","🌿","🫒","🌈","⭐","🌟","✨","👑","⛵","🔥","💧","🕯️","☁️","🌅","🍯","🐪","🌾","🗝️"];
+function buildDeco(){
+  const mk=(arr,host)=>{
+    const el=$(host); if(!el||el.childElementCount) return;
+    arr.forEach(e=>{
+      const s=document.createElement("span");
+      s.className="chip"; s.textContent=e; s.dataset.e=e;
+      s.onclick=()=>setSticker(e);
+      el.appendChild(s);
+    });
+  };
+  mk(ANIMALS,"#animalChips"); mk(BIBLE_E,"#bibleChips");
+}
+function syncDeco(){
+  $("#stkSizeR").value=state.stkSize||14;
+  $("#stkXR").value=state.stkX==null?50:state.stkX;
+  $("#stkYR").value=state.stkY==null?80:state.stkY;
+  $$("#animalChips .chip, #bibleChips .chip").forEach(c=>c.classList.toggle("on",c.dataset.e===state.sticker));
+}
+function setSticker(e){
+  state.sticker=(state.sticker===e)?"":e;   // 같은 걸 다시 누르면 제거
+  syncDeco(); save(); render();
+}
+$("#stkClear").onclick=()=>{ state.sticker=""; syncDeco(); save(); render(); };
+const bindStk=(id,key)=>$(id).oninput=ev=>{ state[key]=+ev.target.value; save(); render(); };
+bindStk("#stkSizeR","stkSize"); bindStk("#stkXR","stkX"); bindStk("#stkYR","stkY");
+// 미리보기에서 캐릭터 끌어 옮기기 (터치/마우스 공용 - Pointer Events)
+(function(){
+  let drag=false;
+  const toPct=ev=>{
+    const r=cv.getBoundingClientRect();
+    return {
+      x:Math.max(0,Math.min(100,Math.round((ev.clientX-r.left)/r.width*100))),
+      y:Math.max(0,Math.min(100,Math.round((ev.clientY-r.top)/r.height*100)))
+    };
+  };
+  const move=ev=>{
+    if(!drag||!state.sticker) return;
+    ev.preventDefault();
+    const p=toPct(ev); state.stkX=p.x; state.stkY=p.y;
+    $("#stkXR").value=p.x; $("#stkYR").value=p.y;
+    render();
+  };
+  cv.addEventListener("pointerdown",ev=>{ if(!state.sticker) return; drag=true; move(ev); });
+  window.addEventListener("pointermove",move,{passive:false});
+  window.addEventListener("pointerup",()=>{ if(drag){ drag=false; save(); } });
+})();
+
+/* ---------- 무료 AI (Pollinations) ---------- */
+async function genPollinations(prompt){
+  const [w,h]=RATIOS[state.ratio];
+  const seed=Math.floor(Math.random()*1e6);
+  const ar = w>=h ? [Math.round(1024*w/h),1024] : [1024,Math.round(1024*h/w)];
+  const u=`https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${ar[0]}&height=${ar[1]}&seed=${seed}&nologo=true&model=flux&safe=true`;
+  return loadImage(u);
+}
+async function aiGenerate(){
+  buildAIPromptIfEmpty();
+  const p=$("#aiPrompt").value.trim()||MOODS[state.mood];
+  status('<span class="spin"></span>AI 그림 생성 중… (10~25초)');
+  try{ setBg(await genPollinations(p)); status("AI 그림 완성!","ok"); }
+  catch(e){ status("생성 실패: 네트워크를 확인하고 다시 시도하세요.","err"); }
+}
+function buildAIPromptIfEmpty(){ if(!$("#aiPrompt").value.trim()) buildAIPrompt(); }
+$("#aiGen").onclick=aiGenerate;
+$("#aiReroll").onclick=aiGenerate;
+
+/* ---------- 내 사진 업로드 ---------- */
+$("#fileInput").onchange=e=>{
+  const f=e.target.files&&e.target.files[0]; if(!f) return;
+  if(lastObjectURL) URL.revokeObjectURL(lastObjectURL);
+  lastObjectURL=URL.createObjectURL(f);
+  loadImage(lastObjectURL,{cross:false}).then(im=>{ setBg(im); status("사진을 불러왔습니다.","ok"); })
+    .catch(()=>status("이미지 형식을 확인하세요.","err"));
+};
+
+/* ---------- 사진 검색 (다중 소스: Wikimedia + Openverse, 폴백 Picsum) ---------- */
+// 각 항목 = { u: 기본 URL, alt: 대체 URL(CORS 안전) }
+// 두 소스를 병렬로 검색해 교차 병합, 로딩 실패 시 alt→다음 항목으로 자동 건너뜀
+
+async function wikimediaSearch(q){
+  const api=`https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*`+
+    `&generator=search&gsrnamespace=6&gsrlimit=24&gsrsearch=${encodeURIComponent(q+" filetype:bitmap")}`+
+    `&prop=imageinfo&iiprop=url|size|mime&iiurlwidth=2000`;
+  const r=await fetch(api); if(!r.ok) return [];
+  const j=await r.json();
+  const pages=j.query&&j.query.pages?Object.values(j.query.pages):[];
+  return pages.map(p=>p.imageinfo&&p.imageinfo[0]).filter(Boolean)
+    .filter(i=>(i.mime==="image/jpeg"||i.mime==="image/png")&&i.width>=900)
+    .map(i=>({u:i.thumburl||i.url, alt:i.thumburl||i.url}));   // upload.wikimedia.org = CORS 안전
+}
+async function openverseSearch(q){
+  const ar = state.ratio==="1:1" ? "square" : "tall";
+  const api=`https://api.openverse.org/v1/images/?q=${encodeURIComponent(q)}`+
+    `&page_size=24&mature=false&aspect_ratio=${ar}`;
+  const r=await fetch(api,{headers:{Accept:"application/json"}});
+  if(!r.ok) return [];                                          // 미인증 한도 초과 등 → 조용히 건너뜀
+  const j=await r.json();
+  return (j.results||[]).filter(it=>it&&it.url)
+    .map(it=>({u:it.url, alt:it.thumbnail||it.url}));            // 원본 실패 시 Openverse 프록시(CORS 안전)로 대체
+}
+async function searchPhotos(q){
+  status('<span class="spin"></span>여러 소스에서 사진 검색 중…');
+  const [wmR,ovR]=await Promise.allSettled([wikimediaSearch(q),openverseSearch(q)]);
+  const wm=wmR.status==="fulfilled"?wmR.value:[];
+  const ov=ovR.status==="fulfilled"?ovR.value:[];
+  const merged=[], seen=new Set();
+  for(let i=0;i<Math.max(wm.length,ov.length);i++){
+    [ov[i],wm[i]].forEach(it=>{ if(it&&!seen.has(it.u)){ seen.add(it.u); merged.push(it); } });
+  }
+  if(!merged.length) throw new Error("결과 없음");
+  state.searchList=merged; state.searchIdx=0;
+  await showSearch(1);
+}
+function picsumPack(){
+  const [W,H]=RATIOS[state.ratio]; const arr=[];
+  for(let i=0;i<18;i++){
+    arr.push({u:`https://picsum.photos/seed/${Math.floor(Math.random()*1e6)}/${W}/${H}`});
+  }
+  state.searchList=arr; state.searchIdx=0; showSearch(1);
+}
+// url 목록을 차례로 시도해 처음 성공한 이미지를 반환
+function loadFirst(urls){
+  return new Promise((resolve,reject)=>{
+    let k=0;
+    (function next(){
+      if(k>=urls.length) return reject(new Error("load fail"));
+      loadImage(urls[k++]).then(resolve).catch(next);
+    })();
+  });
+}
+async function showSearch(dir){
+  if(!state.searchList.length){ status("검색 결과가 없습니다.","err"); return; }
+  let i=state.searchIdx; const step=dir<0?-1:1;
+  status('<span class="spin"></span>사진 불러오는 중…');
+  for(let t=0;t<state.searchList.length;t++){
+    const item=state.searchList[i];
+    try{
+      const im=await loadFirst([item.u,item.alt].filter(Boolean));
+      state.searchIdx=i;
+      $("#searchPrev").disabled=i<=0;
+      $("#searchNext").disabled=i>=state.searchList.length-1;
+      setBg(im);
+      status(`사진 ${i+1} / ${state.searchList.length}`,"ok");
+      return;
+    }catch(e){
+      i+=step; if(i<0||i>=state.searchList.length) break;
+    }
+  }
+  status("불러올 수 있는 사진이 없습니다. 다른 키워드나 ‘고화질 추천’을 눌러보세요.","err");
+}
+$("#searchBtn").onclick=async()=>{
+  const q=$("#searchQ").value.trim(); if(!q){status("검색어를 입력하세요.","err");return;}
+  try{ await searchPhotos(q); }
+  catch(e){ status("검색 결과가 없습니다. 다른 키워드를 쓰거나 ‘고화질 추천’을 눌러보세요.","err"); }
+};
+$("#searchQ").addEventListener("keydown",e=>{ if(e.key==="Enter") $("#searchBtn").click(); });
+$("#searchPrev").onclick=()=>{ if(state.searchIdx>0){ state.searchIdx--; showSearch(-1); } };
+$("#searchNext").onclick=()=>{ if(state.searchIdx<state.searchList.length-1){ state.searchIdx++; showSearch(1); } };
+$("#hqBtn").onclick=picsumPack;
+
+/* ---------- 고급: OpenAI / Gemini ---------- */
+// fetch 자체 실패(네트워크/CORS) 판별
+function isNetErr(e){
+  return !!(e && (e.name==="TypeError" || /failed to fetch|network|load failed/i.test(e.message||"")));
+}
+function geminiImage(j){
+  const parts=(j.candidates&&j.candidates[0]&&j.candidates[0].content&&j.candidates[0].content.parts)||[];
+  const p=parts.find(x=>x.inlineData||x.inline_data);
+  const d=p&&(p.inlineData||p.inline_data);
+  if(!d) return null;
+  return loadImage(`data:${d.mimeType||d.mime_type||"image/png"};base64,${d.data}`,{cross:false});
+}
+
+async function genOpenAI(key,prompt){
+  const [w,h]=RATIOS[state.ratio];
+  async function call(model){
+    const body = model==="gpt-image-1"
+      ? {model,prompt,size:(w===h?"1024x1024":(h>w?"1024x1536":"1536x1024")),n:1}
+      : {model,prompt,size:(w===h?"1024x1024":(h>w?"1024x1792":"1792x1024")),n:1,response_format:"b64_json"};
+    let r;
+    try{
+      r=await fetch("https://api.openai.com/v1/images/generations",{
+        method:"POST",
+        headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
+        body:JSON.stringify(body)
+      });
+    }catch(e){ if(isNetErr(e)) throw new Error("__CORS__"); throw e; }
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok){
+      const er=new Error((j.error&&j.error.message)||("HTTP "+r.status));
+      er.status=r.status; throw er;
+    }
+    return loadImage("data:image/png;base64,"+j.data[0].b64_json,{cross:false});
+  }
+  try{ return await call("gpt-image-1"); }
+  catch(e){
+    if(e.message==="__CORS__")
+      throw new Error("OpenAI는 브라우저에서 직접 호출(CORS)을 지원하지 않습니다. ‘무료 AI’ 또는 ‘나노바나나(Gemini)’를 쓰시거나, 앱을 웹서버(Netlify 등)에 올린 뒤 사용하세요.");
+    if(e.status===403 || /verif|permission|must be verified/i.test(e.message)){
+      try{ return await call("dall-e-3"); }
+      catch(e2){
+        if(e2.message==="__CORS__") throw new Error("OpenAI는 브라우저 직접 호출(CORS)을 지원하지 않습니다. Gemini를 쓰거나 웹 배포 후 사용하세요.");
+        throw new Error("OpenAI: "+e2.message);
+      }
+    }
+    throw new Error("OpenAI: "+e.message);
+  }
+}
+
+const GEMINI_MODELS=["gemini-2.5-flash-image","gemini-2.5-flash-image-preview","gemini-2.0-flash-preview-image-generation"];
+async function genGemini(key,prompt){
+  let last="키 또는 모델을 확인하세요.";
+  for(const model of GEMINI_MODELS){
+    const url=`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`;
+    const text=prompt+". "+STYLE_EN;
+    const tryCall=async(useCfg)=>{
+      const payload=useCfg
+        ? {contents:[{parts:[{text}]}],generationConfig:{responseModalities:["TEXT","IMAGE"]}}
+        : {contents:[{parts:[{text}]}]};
+      let r;
+      try{
+        r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+      }catch(e){ if(isNetErr(e)) return {net:true}; throw e; }
+      const j=await r.json().catch(()=>({}));
+      return {ok:r.ok,status:r.status,j};
+    };
+    let res=await tryCall(true);
+    if(res.net){ last="네트워크 오류(인터넷 연결을 확인하세요)."; continue; }
+    if(!res.ok){
+      const code=(res.j.error&&res.j.error.status)||res.status;
+      const msg=(res.j.error&&res.j.error.message)||("HTTP "+res.status);
+      last=msg;
+      if(res.status===404||code==="NOT_FOUND") continue;            // 모델명 → 다음 후보
+      if(/INVALID_ARGUMENT/i.test(code)&&/modalit/i.test(msg)){      // 옵션 미지원 → 옵션 없이 재시도
+        res=await tryCall(false);
+        if(res.net||!res.ok){ last=(res.j&&res.j.error&&res.j.error.message)||last; continue; }
+      } else {
+        // 키/권한/할당량 문제는 즉시 중단(원문 메시지 표시)
+        throw new Error("Gemini ("+code+"): "+msg);
+      }
+    }
+    const im=geminiImage(res.j);
+    if(im) return im;
+    last="이미지가 반환되지 않았습니다(프롬프트가 안전필터에 걸렸을 수 있어요).";
+  }
+  throw new Error("Gemini 실패: "+last);
+}
+$("#proGen").onclick=async()=>{
+  const key=$("#proKey").value.trim();
+  const prompt=$("#proPrompt").value.trim()||($("#aiPrompt").value.trim()||MOODS[state.mood]);
+  if(!key){status("API 키를 입력하세요.","err");return;}
+  $("#proGen").disabled=true;
+  status('<span class="spin"></span>고급 엔진 생성 중… (15~40초)');
+  try{
+    const im = state.proEngine==="openai" ? await genOpenAI(key,prompt) : await genGemini(key,prompt);
+    setBg(im); status("고급 엔진 그림 완성!","ok");
+  }catch(e){
+    status("실패: "+((e&&e.message)||"키/네트워크를 확인하세요."),"err");
+  }finally{
+    $("#proGen").disabled=false;
+  }
+};
+$("#proClear").onclick=()=>{ $("#proKey").value=""; save(); status("키를 지웠습니다.","ok"); };
+
+/* ---------- 폰트 보장 ---------- */
+// 캔버스가 한글을 올바른 글꼴로 그리려면, 실제 사용할 글자(서브셋)까지
+// 미리 로딩해야 한다. document.fonts.load 의 2번째 인자로 본문 텍스트를 넘긴다.
+async function ensureFont(font, weights, sample){
+  const txt = (sample||"") + "가나다라마바사아자차카타파하영원사랑은혜빛길ABCabc0123.,—";
+  try{
+    await Promise.all(weights.map(w =>
+      document.fonts.load(`${w} 64px "${font}"`, txt)
+    ));
+    await document.fonts.ready;
+  }catch(e){ /* 실패해도 폴백으로 계속 진행 */ }
+}
+
+/* ---------- 텍스트 줄바꿈 ---------- */
+function wrapLines(text,maxW){
+  const out=[];
+  text.split("\n").forEach(para=>{
+    if(para===""){ out.push(""); return; }
+    const words=para.split(" "); let line="";
+    const pushChars=(chunk)=>{
+      let cur=line;
+      for(const ch of chunk){
+        const t=cur+ch;
+        if(ctx.measureText(t).width>maxW && cur){ out.push(cur); cur=ch; }
+        else cur=t;
+      }
+      line=cur;
+    };
+    words.forEach((w,i)=>{
+      const tryLine=line?line+" "+w:w;
+      if(ctx.measureText(tryLine).width<=maxW){ line=tryLine; }
+      else{
+        if(line){ out.push(line); line=""; }
+        if(ctx.measureText(w).width<=maxW){ line=w; }
+        else { pushChars(w); }
+      }
+    });
+    if(line||para==="") out.push(line);
+  });
+  return out;
+}
+
+/* ---------- 렌더링 ---------- */
+let needRefit=true, rafId=null, drawSeq=0;
+function render(){ if(rafId) cancelAnimationFrame(rafId); rafId=requestAnimationFrame(draw); }
+
+async function draw(){
+  const [W,H]=RATIOS[state.ratio];
+  cv.width=W; cv.height=H;
+  const main=($("#mainText").value||"").trim();
+  const ref=($("#refText").value||"").trim();
+  const isFrame=state.style==="frame";
+
+  // 배경 영역
+  let bx=0,by=0,bw=W,bh=H, pad=Math.round(W*0.075);
+  if(isFrame){ bx=pad; by=pad; bw=W-pad*2; bh=Math.round(H*0.60); }
+
+  // 바탕
+  ctx.clearRect(0,0,W,H);
+  if(isFrame){ ctx.fillStyle="#fbf7ef"; ctx.fillRect(0,0,W,H); }
+  else { const g=ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,"#5a6b86"); g.addColorStop(1,"#39435a"); ctx.fillStyle=g; ctx.fillRect(0,0,W,H); }
+
+  // 배경 이미지 (cover)
+  if(bgImg){
+    const r=Math.max(bw/bgImg.width,bh/bgImg.height);
+    const iw=bgImg.width*r, ih=bgImg.height*r;
+    ctx.save();
+    if(isFrame){ roundRect(bx,by,bw,bh,18); ctx.clip(); }
+    if(state.blur>0) ctx.filter=`blur(${state.blur}px)`;
+    ctx.drawImage(bgImg, bx+(bw-iw)/2, by+(bh-ih)/2, iw, ih);
+    ctx.filter="none";
+    ctx.restore();
+  }
+
+  // 오버레이 (이미지 위 글자 모드에서만)
+  if(!isFrame){
+    const a=state.over/100;
+    if(state.style==="modern"){
+      ctx.fillStyle=`rgba(15,18,26,${a})`; ctx.fillRect(0,0,W,H);
+    }else{
+      const g=ctx.createLinearGradient(0,H*0.30,0,H);
+      g.addColorStop(0,"rgba(10,14,22,0)");
+      g.addColorStop(1,`rgba(10,14,22,${Math.min(0.92,a+0.30)})`);
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle=`rgba(10,14,22,${a*0.45})`; ctx.fillRect(0,0,W,H);
+    }
+  }
+
+  if(!main && !ref){ status("글귀를 입력하면 카드가 완성됩니다."); return; }
+
+  // 텍스트 영역
+  const txtPad = isFrame ? pad : Math.round(W*0.11);
+  const maxW = W - txtPad*2;
+  const textColor = isFrame ? (state.color==="#ffffff"?"#2a2f3a":state.color) : state.color;
+
+  // 자동 크기 맞춤
+  let base = Math.round(W*0.072) * (state.size/100);
+  let lines, fs=base, refFs;
+  const fontStack = `"${state.font}","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif`;
+  const fweights = FONTS[state.font] || [400,700];
+  const hasW = w => fweights.indexOf(w)>=0;
+  const mainWt = state.style==="modern" ? (hasW(700)?700:fweights[0]) : (hasW(400)?400:fweights[0]);
+  const refWt  = hasW(400)?400:fweights[0];
+
+  const myseq = ++drawSeq;
+  await ensureFont(state.font, [...new Set([mainWt,refWt])], main+" "+ref);
+  if(myseq!==drawSeq) return;            // 더 최신 렌더가 진행 중이면 이 그리기는 폐기
+
+  for(let i=0;i<24;i++){
+    ctx.font=`${mainWt} ${fs}px ${fontStack}`;
+    lines=wrapLines(main,maxW);
+    const lh=fs*1.42;
+    refFs=Math.round(fs*0.52);
+    const refH = ref ? refFs*2.4 : 0;
+    const totalH=lines.length*lh+refH;
+    const limitH = isFrame ? (H - (by+bh) - pad*1.4) : H*0.74;
+    if(totalH<=limitH || fs<=22) break;
+    fs-=4;
+  }
+
+  ctx.textAlign = state.align==="left" ? "left" : "center";
+  ctx.textBaseline="alphabetic";
+  const lh=fs*1.42;
+  const blockH=lines.length*lh + (ref?refFs*2.4:0);
+
+  let cx = state.align==="left" ? txtPad : W/2;
+  let topY;
+  if(isFrame){
+    const zoneTop=by+bh+pad*0.7, zoneH=H-zoneTop-pad;
+    topY = zoneTop + Math.max(0,(zoneH-blockH)/2) + fs;
+  }else{
+    topY = H*(state.pos/100) - blockH/2 + fs;
+    topY = Math.max(fs+20, Math.min(topY, H - blockH + fs - 20));
+  }
+
+  if(!isFrame && state.style!=="modern"){
+    ctx.shadowColor="rgba(0,0,0,.55)"; ctx.shadowBlur=Math.round(fs*0.10); ctx.shadowOffsetY=2;
+  }
+  ctx.fillStyle=textColor;
+  let y=topY;
+  for(const ln of lines){ if(ln!=="") ctx.fillText(ln,cx,y); y+=lh; }
+
+  if(ref){
+    ctx.shadowColor="transparent";
+    ctx.font=`${refWt} ${refFs}px ${fontStack}`;
+    ctx.fillStyle=textColor; ctx.globalAlpha=0.82;
+    ctx.fillText(("— "+ref), cx, y+refFs*1.1);
+    ctx.globalAlpha=1;
+  }
+  ctx.shadowColor="transparent";
+
+  if(isFrame){ // 액자 테두리
+    ctx.strokeStyle="rgba(0,0,0,.08)"; ctx.lineWidth=2;
+    roundRectPath(bx,by,bw,bh,18); ctx.stroke();
+  }
+
+  // 캐릭터 / 스티커 (항상 맨 위)
+  if(state.sticker){
+    const sp=Math.round(W*((state.stkSize||14)/100));
+    const sx=W*(((state.stkX==null?50:state.stkX))/100);
+    const sy=H*(((state.stkY==null?80:state.stkY))/100);
+    ctx.save();
+    ctx.textAlign="center"; ctx.textBaseline="middle";
+    ctx.font=`${sp}px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif`;
+    ctx.shadowColor="rgba(0,0,0,.35)"; ctx.shadowBlur=Math.round(sp*0.10); ctx.shadowOffsetY=2;
+    ctx.fillText(state.sticker, sx, sy);
+    ctx.restore();
+  }
+}
+function roundRect(x,y,w,h,r){ roundRectPath(x,y,w,h,r); }
+function roundRectPath(x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+/* ---------- 저장 / 공유 ---------- */
+function canvasBlob(){ return new Promise(res=>cv.toBlob(res,"image/png")); }
+function fileName(){
+  const r=($("#refText").value||"말씀카드").replace(/[\\/:*?"<>|]/g,"").trim().slice(0,24)||"말씀카드";
+  return r+".png";
+}
+$("#dlBtn").onclick=async()=>{
+  try{
+    const b=await canvasBlob();
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(b); a.download=fileName();
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+    status("PNG로 저장했습니다.","ok");
+  }catch(e){
+    status("저장 실패: 외부 사진이 보호되어 있을 수 있어요. AI 그림이나 업로드 사진을 사용해 보세요.","err");
+  }
+};
+$("#shareBtn").onclick=async()=>{
+  try{
+    const b=await canvasBlob();
+    const file=new File([b],fileName(),{type:"image/png"});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],title:"말씀카드"});
+      status("공유했습니다.","ok");
+    }else{
+      $("#dlBtn").click();
+      status("이 기기는 공유를 지원하지 않아 저장했습니다.","ok");
+    }
+  }catch(e){ status("공유가 취소되었습니다."); }
+};
+
+$("#resetAll").onclick=()=>{
+  if(confirm("저장된 글귀·설정·API 키를 모두 지울까요?")){
+    localStorage.removeItem(LS); location.reload();
+  }
+};
+
+/* ---------- 시작 ---------- */
+(async function init(){
+  buildSampleGrid();
+  buildBibleRefs();
+  buildDeco();
+  restore();
+  if(!$("#aiPrompt").value.trim()) buildAIPrompt();
+  if(!$("#mainText").value.trim()){
+    $("#mainText").value="수고하고 무거운 짐 진 자들아\n다 내게로 오라\n내가 너희를 쉬게 하리라";
+    $("#refText").value="마태복음 11:28";
+  }
+  if(state.preset!=null && PRESETS[state.preset]) applyPreset(state.preset);
+  await document.fonts.ready;
+  render();
+})();
+window.addEventListener("resize",()=>render());
+
+/* ---------- 휴대폰 앱(PWA): 오프라인 서비스워커 등록 ---------- */
+if("serviceWorker"in navigator && location.protocol.startsWith("http")){
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("sw.js").catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>

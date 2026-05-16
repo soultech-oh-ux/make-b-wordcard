@@ -1,0 +1,10 @@
+# OS / 에디터
+.DS_Store
+Thumbs.db
+*.log
+
+# 도구 아티팩트
+claude.cmd
+.claude/
+.vercel/
+node_modules/
