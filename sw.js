@@ -1,11 +1,16 @@
-/* 말씀카드 메이커 - 서비스워커 (오프라인 지원) */
-const CACHE = "wordcard-v1";
+/* 굿메세지 - 서비스워커 (오프라인 지원) */
+const CACHE = "wordcard-v7";
 const SHELL = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
   "./icon-192.png",
-  "./icon-512.png"
+  "./icon-512.png",
+  "./data/verses.json",
+  "./data/bible_books.json",
+  "./data/texts_kjv.json",
+  "./data/texts_web.json",
+  "./data/quotes.json"
 ];
 
 self.addEventListener("install", e => {

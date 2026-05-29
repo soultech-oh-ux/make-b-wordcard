@@ -4,13 +4,13 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#2f3b52" />
-<title>말씀카드 메이커</title>
+<title>굿메세지</title>
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" href="icon-192.png" />
 <link rel="apple-touch-icon" href="icon-192.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="말씀카드" />
+<meta name="apple-mobile-web-app-title" content="굿메세지" />
 <meta name="mobile-web-app-capable" content="yes" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -108,6 +108,21 @@
   .samples .thumb span{position:absolute;left:5px;bottom:4px;font-size:10px;
     color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.7);line-height:1.2}
   .samples canvas{width:100%;height:auto;display:block}
+  .my-list{display:flex;flex-direction:column;gap:6px;max-height:260px;overflow:auto;
+    border:1px solid var(--line);border-radius:10px;padding:8px;background:#fafafa;margin-top:6px}
+  .my-list .empty{color:var(--muted);font-size:13px;text-align:center;padding:14px 0}
+  .my-list .item{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;
+    border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer}
+  .my-list .item:hover{border-color:var(--brand)}
+  .my-list .item .t{flex:1;min-width:0;font-size:13px;line-height:1.45;word-break:break-word;white-space:pre-wrap}
+  .my-list .item .t .r{color:var(--muted);font-size:12px;margin-top:3px}
+  .my-list .item .del{flex:0 0 auto;background:transparent;border:1px solid var(--line);
+    border-radius:6px;padding:3px 8px;font-size:12px;cursor:pointer;color:var(--muted)}
+  .my-list .item .del:hover{color:#b00;border-color:#b00}
+  .bulk-prog{margin-top:8px}
+  .bulk-bar{height:10px;background:#eef1f6;border-radius:5px;overflow:hidden;border:1px solid var(--line)}
+  .bulk-bar span{display:block;height:100%;width:0;background:var(--brand);transition:width .2s}
+  .bulk-msg{font-size:12px;color:var(--muted);margin-top:4px}
   footer{text-align:center;color:var(--muted);font-size:12px;padding:8px 0 24px}
 </style>
 </head>
@@ -115,7 +130,7 @@
 <header>
   <span class="logo">📖</span>
   <div>
-    <h1>말씀카드 메이커</h1>
+    <h1>굿메세지</h1>
     <p>글귀 + 사진 → 한 장의 카드. 무료 · 설치 없음</p>
   </div>
 </header>
@@ -128,51 +143,41 @@
       <div class="tab" data-tab="bg">② 배경</div>
       <div class="tab" data-tab="design">③ 디자인</div>
       <div class="tab" data-tab="deco">④ 캐릭터</div>
+      <div class="tab" data-tab="myverses">⑤ 내 구절</div>
     </div>
 
-    <!-- 글귀 -->
+    <!-- 굿메세지 -->
     <div class="panel on" data-panel="text">
-      <h2 class="sec">성경 구절</h2>
-      <label>번역본</label>
-      <select id="bibleVer">
-        <option value="kor_rev">개역개정 (참조만 자동 · 본문 직접입력)</option>
-        <option value="kor_easy">쉬운성경 (참조만 자동 · 본문 직접입력)</option>
-        <option value="niv">NIV (참조만 자동 · 본문 직접입력)</option>
-        <option value="kor_hangul">개역한글 (무료 · 본문 자동)</option>
-        <option value="web">WEB 영문 (무료 · 본문 자동)</option>
-        <option value="kjv">KJV 영문 (무료 · 본문 자동)</option>
-      </select>
-      <label>구절 선택</label>
-      <div class="row">
-        <select id="bibleRef" style="flex:1"></select>
-        <button class="btn" id="bibleFetch" style="flex:0 0 104px">구절 넣기</button>
-      </div>
-      <p class="hint">개역개정·NIV·쉬운성경은 저작권 보호로 본문 자동 불러오기가 불가합니다 → ‘참조’만 자동 입력되니 성경에서 본문을 붙여넣어 주세요. 개역한글·WEB·KJV는 본문까지 자동으로 채워집니다.</p>
-
-      <h2 class="sec" style="margin-top:20px">글귀 입력</h2>
-      <label>본문 (말씀 · 시 · 명언)</label>
+      <h2 class="sec">굿메세지</h2>
+      <label>들려주고 싶은 메세지 입력</label>
       <textarea id="mainText" placeholder="예) 수고하고 무거운 짐 진 자들아&#10;다 내게로 오라 내가 너희를 쉬게 하리라"></textarea>
-      <label>출처 · 저자 (선택)</label>
-      <input type="text" id="refText" placeholder="예) 마태복음 11:28 / 윤동주" />
-      <p class="hint">줄바꿈은 Enter 로 입력합니다. 글자 크기는 자동으로 맞춰지며 ③ 디자인에서 조절할 수 있어요.</p>
+      <label>저자 이름</label>
+      <input type="text" id="refText" placeholder="예) 윤동주 · ○○교회" />
+      <label>로고 이미지 (png · jpg, 선택)</label>
+      <div class="btn-row">
+        <button class="btn alt" id="brandLogoBtn">로고 업로드</button>
+        <button class="btn alt" id="brandLogoClear" style="flex:.6">로고 제거</button>
+        <input type="file" id="brandLogoInput" accept="image/png,image/jpeg,image/*" hidden />
+      </div>
+      <p class="hint">줄바꿈은 Enter. 로고 위치·크기, 기관명·링크 서명은 ③ 디자인의 ‘서명·로고’에서 조절할 수 있어요. 성경 구절을 불러오려면 ⑤ ‘내 구절’ 탭을 이용하세요.</p>
     </div>
 
     <!-- 배경 -->
     <div class="panel" data-panel="bg">
       <h2 class="sec">배경 이미지</h2>
       <div class="tabs" id="srcTabs">
-        <div class="tab on" data-src="sample">샘플 30</div>
+        <div class="tab on" data-src="sample">샘플 50</div>
         <div class="tab" data-src="ai">무료 AI</div>
         <div class="tab" data-src="upload">내 사진</div>
         <div class="tab" data-src="search">사진검색</div>
         <div class="tab" data-src="pro">DALL·E/Gemini</div>
       </div>
 
-      <!-- 샘플 배경 30 -->
+      <!-- 샘플 배경 -->
       <div class="panel on" data-src-panel="sample">
-        <label>말씀카드용 배경 (탭하면 적용)</label>
+        <label>배경 선택 (탭하면 적용) · 풍경 20 + 패턴 30</label>
         <div class="samples" id="sampleGrid"></div>
-        <p class="hint">앱이 직접 그려내는 30가지 배경 — 인터넷 없이도 즉시 적용되고, 비율을 바꾸면 자동으로 다시 맞춰집니다.</p>
+        <p class="hint">앞쪽 20종은 <b>사진풍 풍경</b>(노을·바다·들판·숲·밤하늘), 뒤쪽 30종은 패턴 배경입니다. 모두 앱이 직접 그려 인터넷 없이 즉시 적용됩니다. <b>실제 사진</b>을 쓰려면 위 ‘사진검색’ 또는 ‘무료 AI’ 탭을 이용하세요.</p>
       </div>
 
       <!-- 무료 AI -->
@@ -226,7 +231,7 @@
           <option value="openai">DALL·E — OpenAI (gpt-image-1)</option>
         </select>
         <label>API 키</label>
-        <input type="password" id="proKey" placeholder="발급받은 API 키를 붙여넣기" />
+        <input type="password" id="proKey" placeholder="발급받은 자신의 API 키를 붙여넣기 하여 사용하세요" />
         <label>그림 설명</label>
         <textarea id="proPrompt" style="min-height:70px" placeholder="그릴 장면 설명 (③ 글귀에서 자동 채워짐)"></textarea>
         <div class="btn-row">
@@ -302,6 +307,24 @@
         <span class="chip" data-align="left">왼쪽</span>
       </div>
 
+      <h2 class="sec" style="margin-top:18px">서명 · 로고 (선택)</h2>
+      <label>기관 이름 · 링크 (카드 하단에 표시)</label>
+      <input type="text" id="brandText" placeholder="예) ○○교회  ·  instagram.com/our_church" />
+      <div class="grid2" style="margin-top:10px">
+        <div>
+          <label style="margin-top:0">위치</label>
+          <div class="chips" id="brandPosChips">
+            <span class="chip" data-bpos="left">왼쪽 아래</span>
+            <span class="chip on" data-bpos="right">오른쪽 아래</span>
+          </div>
+        </div>
+        <div>
+          <label style="margin-top:0">크기</label>
+          <div class="slider"><input type="range" id="brandSizeR" min="15" max="60" value="28" /></div>
+        </div>
+      </div>
+      <p class="hint">로고는 ① <b>굿메세지</b> 탭에서 업로드하고, 위치·크기·기관명은 여기서 조절합니다. 카드 하단 모서리에 표시되며 PNG 저장·복사·공유·일괄 생성에 모두 함께 들어갑니다.</p>
+
       <details>
         <summary>저장된 설정 / 키 관리</summary>
         <p class="hint">입력값·설정·API 키는 이 기기 브라우저에만 자동 저장됩니다.</p>
@@ -332,6 +355,48 @@
       <div class="slider"><input type="range" id="stkYR" min="0" max="100" value="80" /></div>
       <p class="hint">캐릭터를 탭하면 카드에 추가됩니다. <b>미리보기 화면에서 손가락/마우스로 끌어 옮길 수</b> 있어요. 크기·위치 슬라이더로도 조절 가능합니다.</p>
     </div>
+
+    <!-- 내 구절 모음 + 일괄 생성 -->
+    <div class="panel" data-panel="myverses">
+      <h2 class="sec">성경 구절 가져오기</h2>
+      <label>번역본</label>
+      <select id="bibleVer">
+        <option value="kor_rev">개역개정 (참조만 자동 · 본문 직접입력)</option>
+        <option value="kor_easy">쉬운성경 (참조만 자동 · 본문 직접입력)</option>
+        <option value="niv">NIV (참조만 자동 · 본문 직접입력)</option>
+        <option value="kor_hangul">개역한글 (무료 · 본문 자동)</option>
+        <option value="web">WEB 영문 (무료 · 본문 자동)</option>
+        <option value="kjv">KJV 영문 (무료 · 본문 자동)</option>
+      </select>
+      <label>구절 선택 (카테고리)</label>
+      <div class="row" style="margin-bottom:6px">
+        <select id="bibleCat" style="flex:0 0 120px"></select>
+        <select id="bibleRef" style="flex:1"></select>
+        <button class="btn" id="bibleFetch" style="flex:0 0 104px">구절 넣기</button>
+      </div>
+      <label>구절 직접 입력 (예: <code>창세기 1:1</code>, <code>마 5:3-10</code>, <code>요한복음 3:16</code>)</label>
+      <div class="row">
+        <input type="text" id="bibleManual" style="flex:1" placeholder="원하는 책 장:절을 자유롭게 입력" />
+        <button class="btn alt" id="bibleManualFetch" style="flex:0 0 104px">가져오기</button>
+      </div>
+      <p class="hint">불러온 구절은 ① <b>굿메세지</b> 칸에 채워집니다. 개역개정·NIV·쉬운성경은 저작권 보호로 참조만 자동 입력되니 본문은 직접 붙여넣어 주세요. 개역한글·WEB·KJV는 본문까지 자동으로 채워집니다.</p>
+
+      <h2 class="sec" style="margin-top:18px">신앙 위인 명언 (<span id="quoteCount">0</span>)</h2>
+      <p class="hint">신앙으로 살아온 인물들의 명언 모음입니다. 명언을 <b>탭하면 ① 굿메세지 칸에 채워집니다.</b> 검색으로 인물·내용을 좁힐 수 있어요. 명언은 출처가 불확실할 수 있으니 사용 전 확인을 권장합니다.</p>
+      <input type="text" id="quoteSearch" placeholder="검색 (예: 사랑, 루이스, 기도)" />
+      <div id="quoteList" class="my-list" style="max-height:320px"></div>
+
+      <h2 class="sec" style="margin-top:18px">명언 일괄 생성 (PNG ZIP)</h2>
+      <p class="hint">현재 <b>검색 결과에 보이는 명언 전체</b>를 카드로 만들어 ZIP으로 받습니다. ②배경·③디자인 설정이 모든 카드에 동일하게 적용됩니다. 한 장당 약 0.5~2초.</p>
+      <div class="btn-row">
+        <button class="btn" id="bulkGen">목록 전체로 PNG ZIP 만들기</button>
+        <button class="btn alt" id="bulkCancel" style="flex:.5" disabled>취소</button>
+      </div>
+      <div id="bulkProg" class="bulk-prog" style="display:none">
+        <div class="bulk-bar"><span></span></div>
+        <div class="bulk-msg">준비 중…</div>
+      </div>
+    </div>
   </section>
 
   <!-- ===== 미리보기 ===== -->
@@ -342,13 +407,14 @@
         <div class="status" id="status">글귀와 배경을 넣어 카드를 만들어 보세요.</div>
         <div class="btn-row" style="width:100%">
           <button class="btn" id="dlBtn">PNG 저장</button>
+          <button class="btn alt" id="copyBtn">복사</button>
           <button class="btn alt" id="shareBtn">공유</button>
         </div>
       </div>
     </div>
   </section>
 </div>
-<footer>말씀카드 메이커 · 모든 처리는 내 브라우저에서 이루어집니다</footer>
+<footer>굿메세지 · 모든 처리는 내 브라우저에서 이루어집니다</footer>
 
 <script>
 "use strict";
@@ -383,10 +449,12 @@ let state = {
   over:38, blur:0, align:"center",
   searchList:[], searchIdx:0,
   proEngine:"gemini", preset:null,
-  sticker:"", stkX:50, stkY:80, stkSize:14
+  sticker:"", stkX:50, stkY:80, stkSize:14,
+  brandText:"", brandPos:"right", brandSize:28, brandLogo:""
 };
 let bgImg = null;          // 로드 완료된 Image 객체
 let lastObjectURL = null;
+let brandLogoImg = null;   // 로드 완료된 로고 Image 객체
 
 /* ---------- 저장/복원 ---------- */
 const LS = "wordcard-state-v1";
@@ -396,7 +464,9 @@ function save(){
       state, mainText:$("#mainText").value, refText:$("#refText").value,
       aiPrompt:$("#aiPrompt").value, proKey:$("#proKey").value,
       proPrompt:$("#proPrompt").value,
-      bibleVer:$("#bibleVer").value, bibleRef:$("#bibleRef").value
+      bibleVer:$("#bibleVer").value, bibleRef:$("#bibleRef").value,
+      bibleCat:($("#bibleCat")&&$("#bibleCat").value)||"전체",
+      bibleManual:($("#bibleManual")&&$("#bibleManual").value)||""
     }));
   }catch(e){}
 }
@@ -409,7 +479,12 @@ function restore(){
     if(d.proKey) $("#proKey").value = d.proKey;
     if(d.proPrompt) $("#proPrompt").value = d.proPrompt;
     if(d.bibleVer) $("#bibleVer").value = d.bibleVer;
+    if(d.bibleCat && $("#bibleCat") && $("#bibleCat").querySelector(`option[value="${d.bibleCat}"]`)){
+      $("#bibleCat").value = d.bibleCat;
+      buildBibleRefs();
+    }
     if(d.bibleRef!=null && $("#bibleRef").querySelector(`option[value="${d.bibleRef}"]`)) $("#bibleRef").value = d.bibleRef;
+    if(d.bibleManual && $("#bibleManual")) $("#bibleManual").value = d.bibleManual;
     syncUI();
   }catch(e){}
 }
@@ -424,6 +499,10 @@ function syncUI(){
   setActive("#moodChips",".chip","data-mood",state.mood);
   setActive("#alignChips",".chip","data-align",state.align);
   $$("#colorSw .sw").forEach(s=>s.classList.toggle("on",s.dataset.color===state.color));
+  $("#brandText").value = state.brandText||"";
+  $("#brandSizeR").value = state.brandSize||28;
+  setActive("#brandPosChips",".chip","data-bpos",state.brandPos||"right");
+  if(state.brandLogo) setBrandLogo(state.brandLogo);
   syncDeco();
   showTab(state.tab); showSrc(state.src);
 }
@@ -469,6 +548,50 @@ $("#colorPick").oninput=e=>{
   save(); render();
 };
 
+/* ---------- 서명 / 로고 (브랜딩) ---------- */
+function setBrandLogo(dataURL){
+  state.brandLogo = dataURL || "";
+  if(!dataURL){ brandLogoImg=null; save(); render(); return; }
+  const img=new Image();
+  img.onload=()=>{ brandLogoImg=img; render(); };
+  img.onerror=()=>{ brandLogoImg=null; status("로고 이미지를 불러오지 못했습니다.","err"); render(); };
+  img.src=dataURL;
+}
+// 로고를 적당히 줄여 dataURL로 저장(localStorage 용량 보호: 긴 변 240px)
+function logoFileToDataURL(file){
+  return new Promise((res,rej)=>{
+    const fr=new FileReader();
+    fr.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        const max=240, r=Math.min(1, max/Math.max(img.width,img.height));
+        const w=Math.max(1,Math.round(img.width*r)), h=Math.max(1,Math.round(img.height*r));
+        const oc=document.createElement("canvas"); oc.width=w; oc.height=h;
+        oc.getContext("2d").drawImage(img,0,0,w,h);
+        try{ res(oc.toDataURL("image/png")); }catch(_){ res(fr.result); }
+      };
+      img.onerror=()=>rej(new Error("이미지 디코딩 실패"));
+      img.src=fr.result;
+    };
+    fr.onerror=()=>rej(new Error("파일 읽기 실패"));
+    fr.readAsDataURL(file);
+  });
+}
+$("#brandText").oninput=e=>{ state.brandText=e.target.value; save(); render(); };
+chipGroup("#brandPosChips","data-bpos","brandPos");
+$("#brandSizeR").oninput=e=>{ state.brandSize=+e.target.value; save(); render(); };
+$("#brandLogoBtn").onclick=()=>$("#brandLogoInput").click();
+$("#brandLogoInput").onchange=async(e)=>{
+  const f=e.target.files && e.target.files[0]; if(!f) return;
+  try{
+    const url=await logoFileToDataURL(f);
+    setBrandLogo(url);
+    status("로고를 추가했습니다.","ok");
+  }catch(_){ status("로고를 불러오지 못했습니다.","err"); }
+  e.target.value="";
+};
+$("#brandLogoClear").onclick=()=>{ setBrandLogo(""); status("로고를 제거했습니다."); };
+
 /* ---------- 슬라이더/입력 ---------- */
 const bind=(id,key)=>$(id).oninput=e=>{ state[key]=+e.target.value; save(); render(); };
 bind("#sizeR","size"); bind("#posR","pos"); bind("#overR","over"); bind("#blurR","blur");
@@ -504,6 +627,28 @@ function setBg(img,isPreset){ bgImg=img; if(!isPreset) state.preset=null; needRe
 /* ================= 샘플 배경 30종 (앱이 직접 그림) ================= */
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
 const PRESETS=[
+  // ── 사진풍 풍경 배경 20종 (앱이 그림) ──
+  {n:"노을 산맥",t:"scene",sky:["#fbd6a0","#f2996a","#5d3f73"],sun:"#fff1d0",sunGlow:"rgba(255,230,180,.9)",sunx:.72,suny:.30,sunr:.08,layers:[{y:.60,color:"#7a5a86",type:"ridge",amp:.12,seg:7},{y:.72,color:"#553f63",type:"ridge",amp:.14,seg:6},{y:.85,color:"#33263f",type:"ridge",amp:.12,seg:8}]},
+  {n:"새벽 산안개",t:"scene",sky:["#22324f","#5a7396","#e8b98a"],sun:"#ffe6c0",sunGlow:"rgba(255,220,170,.7)",sunx:.5,suny:.42,sunr:.06,layers:[{y:.64,color:"#3f5570",type:"ridge",amp:.10,seg:6},{y:.78,color:"#2a3a52",type:"ridge",amp:.12,seg:7}]},
+  {n:"청록 산맥",t:"scene",sky:["#bfe6e0","#6fb0ab","#2f6b66"],layers:[{y:.58,color:"#4f8f88",type:"ridge",amp:.12,seg:7},{y:.72,color:"#356b66",type:"ridge",amp:.13,seg:6},{y:.85,color:"#214744",type:"ridge",amp:.12,seg:8}]},
+  {n:"보라 황혼",t:"scene",sky:["#3a2a5a","#6a4a8c","#d98aa0"],sun:"#ffd9e6",sunGlow:"rgba(255,200,220,.7)",sunx:.3,suny:.34,sunr:.07,layers:[{y:.66,color:"#4a3a6b",type:"ridge",amp:.12,seg:6},{y:.80,color:"#2e2447",type:"ridge",amp:.12,seg:7}]},
+  {n:"바다 일몰",t:"scene",sky:["#fcd29a","#f59a6a","#9a4a6b"],sun:"#fff0cf",sunGlow:"rgba(255,225,170,.95)",sunx:.5,suny:.42,sunr:.09,layers:[{y:.56,color:"#5a2f4a",type:"hill",amp:0}]},
+  {n:"아침 바다",t:"scene",sky:["#d6ecf5","#fdfdfa","#fbe6c0"],sun:"#fff4da",sunGlow:"rgba(255,240,200,.8)",sunx:.5,suny:.40,sunr:.07,layers:[{y:.58,color:"#86b4cc",type:"hill",amp:0}]},
+  {n:"쪽빛 바다",t:"scene",sky:["#7fc0e8","#cfeaf6","#eaf6fb"],layers:[{y:.60,color:"#2f7aa6",type:"hill",amp:0},{y:.62,color:"#21617f",type:"hill",amp:0}]},
+  {n:"분홍 노을 바다",t:"scene",sky:["#ffd9e0","#f6a8b8","#7a4a72"],sun:"#fff0e6",sunGlow:"rgba(255,210,210,.85)",sunx:.5,suny:.43,sunr:.08,layers:[{y:.57,color:"#9a5a76",type:"hill",amp:0}]},
+  {n:"초록 들판",t:"scene",sky:["#acd8f0","#dff0f8","#f3fbe8"],sun:"#fffce8",sunGlow:"rgba(255,250,210,.6)",sunx:.74,suny:.24,sunr:.06,layers:[{y:.62,color:"#7fae4f",type:"hill",amp:.05},{y:.74,color:"#5a8f3a",type:"hill",amp:.06},{y:.86,color:"#3f6b29",type:"hill",amp:.05}]},
+  {n:"유채 들판",t:"scene",sky:["#bfe2f2","#eaf6fb"],layers:[{y:.64,color:"#e8c84a",type:"hill",amp:.05},{y:.76,color:"#d6b232",type:"hill",amp:.06},{y:.88,color:"#b5922a",type:"hill",amp:.05}]},
+  {n:"라벤더 들판",t:"scene",sky:["#e6d6f0","#cdb6e6","#f3ecf8"],layers:[{y:.66,color:"#9a7fc0",type:"hill",amp:.05},{y:.78,color:"#7d63a8",type:"hill",amp:.06},{y:.90,color:"#5f4a86",type:"hill",amp:.04}]},
+  {n:"가을 들판",t:"scene",sky:["#f5d9a8","#f8ecd0"],sun:"#fff0d0",sunGlow:"rgba(255,225,180,.6)",sunx:.3,suny:.26,sunr:.06,layers:[{y:.64,color:"#d68f3a",type:"hill",amp:.05},{y:.78,color:"#b56b2a",type:"hill",amp:.06},{y:.90,color:"#8f4f22",type:"hill",amp:.04}]},
+  {n:"숲 아침",t:"scene",sky:["#dff0e0","#f3faf0","#eaf6e0"],sun:"#fcffe8",sunGlow:"rgba(240,255,210,.6)",sunx:.6,suny:.20,sunr:.05,layers:[{y:.60,color:"#5a8f5a",type:"trees",amp:.12,seg:16},{y:.74,color:"#3f6b3f",type:"trees",amp:.14,seg:13},{y:.88,color:"#264a26",type:"trees",amp:.12,seg:18}]},
+  {n:"침엽수림",t:"scene",sky:["#bcd6d0","#8fb4ae","#5d8480"],layers:[{y:.58,color:"#3f6b5f",type:"trees",amp:.13,seg:18},{y:.74,color:"#2a4f47",type:"trees",amp:.15,seg:15},{y:.88,color:"#173330",type:"trees",amp:.12,seg:20}]},
+  {n:"안개 숲",t:"scene",sky:["#dfe6e6","#c6d2d0","#aab8b6"],clouds:{n:6,c:"rgba(235,240,240,.6)"},layers:[{y:.62,color:"#6a7f72",type:"trees",amp:.12,seg:16},{y:.78,color:"#4f6356",type:"trees",amp:.13,seg:14}]},
+  {n:"초록 언덕 노을",t:"scene",sky:["#fce0b0","#f3b07a","#8f5a6b"],sun:"#fff2d6",sunGlow:"rgba(255,228,180,.85)",sunx:.7,suny:.32,sunr:.08,layers:[{y:.66,color:"#6a7f4a",type:"hill",amp:.05},{y:.82,color:"#46582f",type:"hill",amp:.05}]},
+  {n:"파란 하늘 구름",t:"scene",sky:["#5aa6e0","#9ccdf0","#d6ecfa"],clouds:{n:6,c:"rgba(255,255,255,.85)"}},
+  {n:"노을 구름",t:"scene",sky:["#f6b86a","#f08a7a","#7a4a8c"],clouds:{n:5,c:"rgba(255,220,200,.6)"}},
+  {n:"별 밤",t:"scene",sky:["#070d20","#13203f","#26365e"],stars:140,layers:[{y:.80,color:"#0a1124",type:"ridge",amp:.08,seg:7}]},
+  {n:"은하수",t:"scene",sky:["#0a0a1f","#1a1438","#2e2452"],stars:180,clouds:{n:4,c:"rgba(150,140,210,.25)"},layers:[{y:.84,color:"#0a0818",type:"ridge",amp:.06,seg:8}]},
+  // ── 추상 / 패턴 배경 30종 ──
   {n:"새벽하늘",t:"lin",c:["#1b2a4a","#3a5a8c","#cf9b6d"]},
   {n:"일출",t:"lin",c:["#f6c177","#ef8a5a","#7a3b6b"]},
   {n:"황금들녘",t:"lin",c:["#fceabb","#f6b94f","#c77f2e"]},
@@ -537,6 +682,7 @@ const PRESETS=[
 ];
 function paintPreset(g,W,H,p,idx){
   const rnd=mulberry32((idx+1)*9973);
+  if(p.t==="scene"){ paintScenery(g,W,H,p,rnd); applyVignette(g,W,H,p.vig==null?0.20:p.vig); return; }
   if(p.t!=="paper"){
     const grd=g.createLinearGradient(0,0,0,H);
     p.c.forEach((c,i)=>grd.addColorStop(i/(p.c.length-1),c));
@@ -591,9 +737,81 @@ function paintPreset(g,W,H,p,idx){
     }
     g.restore();
   }
+  applyVignette(g,W,H,p.vig==null?0.26:p.vig);
+}
+function applyVignette(g,W,H,amt){
   const vg=g.createRadialGradient(W/2,H/2,Math.min(W,H)*0.32,W/2,H/2,Math.max(W,H)*0.78);
-  vg.addColorStop(0,"rgba(0,0,0,0)"); vg.addColorStop(1,`rgba(0,0,0,${p.vig||0.26})`);
+  vg.addColorStop(0,"rgba(0,0,0,0)"); vg.addColorStop(1,`rgba(0,0,0,${amt==null?0.26:amt})`);
   g.fillStyle=vg; g.fillRect(0,0,W,H);
+}
+/* ---------- 사진풍 풍경 배경 렌더러 ---------- */
+function paintScenery(g,W,H,p,rnd){
+  // 하늘
+  const sky=p.sky||["#888","#444"];
+  const grd=g.createLinearGradient(0,0,0,H);
+  sky.forEach((c,i)=>grd.addColorStop(i/Math.max(1,sky.length-1),c));
+  g.fillStyle=grd; g.fillRect(0,0,W,H);
+  // 별
+  if(p.stars){
+    for(let i=0;i<p.stars;i++){
+      const x=rnd()*W, y=rnd()*H*0.72, r=rnd()*1.6+0.4;
+      g.globalAlpha=0.35+rnd()*0.6; g.fillStyle="#fff";
+      g.beginPath(); g.arc(x,y,r,0,7); g.fill();
+    }
+    g.globalAlpha=1;
+  }
+  // 태양/달 + 광채
+  if(p.sun){
+    const sx=W*(p.sunx==null?0.5:p.sunx), sy=H*(p.suny==null?0.28:p.suny), R=Math.min(W,H)*(p.sunr||0.08);
+    const halo=g.createRadialGradient(sx,sy,0,sx,sy,R*3.4);
+    halo.addColorStop(0,p.sunGlow||"rgba(255,240,210,.9)");
+    halo.addColorStop(1,"rgba(255,240,210,0)");
+    g.fillStyle=halo; g.fillRect(0,0,W,H);
+    g.beginPath(); g.arc(sx,sy,R,0,7); g.fillStyle=p.sun; g.fill();
+  }
+  // 구름
+  if(p.clouds){
+    g.save();
+    g.filter="blur("+Math.max(4,Math.round(W*0.012))+"px)";
+    const n=p.clouds.n||5;
+    for(let i=0;i<n;i++){
+      const cx=rnd()*W, cy=H*(0.10+rnd()*0.42), cw=(0.16+rnd()*0.22)*W, ch=cw*0.32;
+      g.globalAlpha=0.5+rnd()*0.4; g.fillStyle=p.clouds.c||"rgba(255,255,255,.6)";
+      g.beginPath(); g.ellipse(cx,cy,cw,ch,0,0,7); g.fill();
+    }
+    g.restore(); g.globalAlpha=1;
+  }
+  // 지형 레이어 (뒤→앞)
+  (p.layers||[]).forEach(L=>paintSceneLayer(g,W,H,L,rnd));
+}
+function paintSceneLayer(g,W,H,L,rnd){
+  const baseY=H*L.y;
+  g.fillStyle=L.color;
+  g.beginPath();
+  g.moveTo(0,H); g.lineTo(0,baseY);
+  if(L.type==="ridge"){
+    const seg=L.seg||7, amp=H*(L.amp||0.10);
+    for(let i=0;i<=seg;i++){
+      const x=W*i/seg;
+      const edge=(i===0||i===seg)?amp*0.25:0;
+      g.lineTo(x, baseY - rnd()*amp + edge);
+    }
+  } else if(L.type==="hill"){
+    const seg=40, amp=H*(L.amp||0.05), ph=rnd()*6.28, fr=1+Math.floor(rnd()*2);
+    for(let i=0;i<=seg;i++){
+      const x=W*i/seg;
+      g.lineTo(x, baseY - Math.sin(i/seg*Math.PI*fr+ph)*amp);
+    }
+  } else if(L.type==="trees"){
+    const seg=L.seg||14, tw=W/seg, amp=H*(L.amp||0.10);
+    g.lineTo(0,baseY);
+    for(let i=0;i<seg;i++){
+      const x=tw*i, th=amp*(0.55+rnd()*0.8);
+      g.lineTo(x+tw*0.5, baseY-th);
+      g.lineTo(x+tw, baseY);
+    }
+  }
+  g.lineTo(W,baseY); g.lineTo(W,H); g.closePath(); g.fill();
 }
 function buildSampleGrid(){
   const grid=$("#sampleGrid"); if(!grid||grid.childElementCount) return;
@@ -622,60 +840,185 @@ function applyPreset(idx){
 
 /* ================= 성경 구절 ================= */
 // label: 한글 표기, bk: 책 번호(1~66), ch: 장, v1~v2: 절 범위, en: bible-api 영문 참조
-const REFS=[
-  {label:"요한복음 3:16",bk:43,ch:3,v1:16,v2:16,en:"john 3:16"},
-  {label:"시편 23:1-4",bk:19,ch:23,v1:1,v2:4,en:"psalm 23:1-4"},
-  {label:"빌립보서 4:13",bk:50,ch:4,v1:13,v2:13,en:"philippians 4:13"},
-  {label:"빌립보서 4:6-7",bk:50,ch:4,v1:6,v2:7,en:"philippians 4:6-7"},
-  {label:"마태복음 11:28",bk:40,ch:11,v1:28,v2:28,en:"matthew 11:28"},
-  {label:"마태복음 6:33",bk:40,ch:6,v1:33,v2:33,en:"matthew 6:33"},
-  {label:"이사야 41:10",bk:23,ch:41,v1:10,v2:10,en:"isaiah 41:10"},
-  {label:"잠언 3:5-6",bk:20,ch:3,v1:5,v2:6,en:"proverbs 3:5-6"},
-  {label:"여호수아 1:9",bk:6,ch:1,v1:9,v2:9,en:"joshua 1:9"},
-  {label:"시편 46:1",bk:19,ch:46,v1:1,v2:1,en:"psalm 46:1"},
-  {label:"로마서 8:28",bk:45,ch:8,v1:28,v2:28,en:"romans 8:28"},
-  {label:"예레미야 29:11",bk:24,ch:29,v1:11,v2:11,en:"jeremiah 29:11"},
-  {label:"고린도전서 13:4-7",bk:46,ch:13,v1:4,v2:7,en:"1 corinthians 13:4-7"},
-  {label:"시편 119:105",bk:19,ch:119,v1:105,v2:105,en:"psalm 119:105"},
-  {label:"갈라디아서 2:20",bk:48,ch:2,v1:20,v2:20,en:"galatians 2:20"},
-  {label:"베드로전서 5:7",bk:60,ch:5,v1:7,v2:7,en:"1 peter 5:7"},
-  {label:"이사야 40:31",bk:23,ch:40,v1:31,v2:31,en:"isaiah 40:31"},
-  {label:"시편 27:1",bk:19,ch:27,v1:1,v2:1,en:"psalm 27:1"},
-  {label:"빌립보서 4:19",bk:50,ch:4,v1:19,v2:19,en:"philippians 4:19"},
-  {label:"마태복음 28:20",bk:40,ch:28,v1:20,v2:20,en:"matthew 28:20"},
-  {label:"요한복음 14:6",bk:43,ch:14,v1:6,v2:6,en:"john 14:6"},
-  {label:"시편 121:1-2",bk:19,ch:121,v1:1,v2:2,en:"psalm 121:1-2"},
-  {label:"히브리서 11:1",bk:58,ch:11,v1:1,v2:1,en:"hebrews 11:1"},
-  {label:"로마서 12:2",bk:45,ch:12,v1:2,v2:2,en:"romans 12:2"},
-  {label:"에베소서 2:8",bk:49,ch:2,v1:8,v2:8,en:"ephesians 2:8"},
-  {label:"시편 37:4",bk:19,ch:37,v1:4,v2:4,en:"psalm 37:4"},
-  {label:"데살로니가전서 5:16-18",bk:52,ch:5,v1:16,v2:18,en:"1 thessalonians 5:16-18"},
-  {label:"야고보서 1:5",bk:59,ch:1,v1:5,v2:5,en:"james 1:5"},
-  {label:"요한일서 4:7",bk:62,ch:4,v1:7,v2:7,en:"1 john 4:7"},
-  {label:"마태복음 5:16",bk:40,ch:5,v1:16,v2:16,en:"matthew 5:16"},
-  {label:"잠언 16:3",bk:20,ch:16,v1:3,v2:3,en:"proverbs 16:3"},
-  {label:"디모데후서 1:7",bk:55,ch:1,v1:7,v2:7,en:"2 timothy 1:7"},
-  {label:"시편 91:1-2",bk:19,ch:91,v1:1,v2:2,en:"psalm 91:1-2"},
-  {label:"미가 6:8",bk:33,ch:6,v1:8,v2:8,en:"micah 6:8"},
-  {label:"시편 16:11",bk:19,ch:16,v1:11,v2:11,en:"psalm 16:11"},
-  {label:"요한복음 8:12",bk:43,ch:8,v1:12,v2:12,en:"john 8:12"}
+// 인라인 fallback — data/verses.json 로드 실패 시(예: file:// 직접 열기)에도 기본 목록은 동작
+let REFS=[
+  {label:"요한복음 3:16",category:"사랑",bk:43,ch:3,v1:16,v2:16,en:"john 3:16"},
+  {label:"시편 23:1-4",category:"위로",bk:19,ch:23,v1:1,v2:4,en:"psalm 23:1-4"},
+  {label:"빌립보서 4:13",category:"믿음",bk:50,ch:4,v1:13,v2:13,en:"philippians 4:13"},
+  {label:"빌립보서 4:6-7",category:"기도",bk:50,ch:4,v1:6,v2:7,en:"philippians 4:6-7"},
+  {label:"마태복음 11:28",category:"위로",bk:40,ch:11,v1:28,v2:28,en:"matthew 11:28"},
+  {label:"마태복음 6:33",category:"지혜",bk:40,ch:6,v1:33,v2:33,en:"matthew 6:33"},
+  {label:"이사야 41:10",category:"위로",bk:23,ch:41,v1:10,v2:10,en:"isaiah 41:10"},
+  {label:"잠언 3:5-6",category:"지혜",bk:20,ch:3,v1:5,v2:6,en:"proverbs 3:5-6"},
+  {label:"여호수아 1:9",category:"믿음",bk:6,ch:1,v1:9,v2:9,en:"joshua 1:9"},
+  {label:"시편 46:1",category:"위로",bk:19,ch:46,v1:1,v2:1,en:"psalm 46:1"},
+  {label:"로마서 8:28",category:"소망",bk:45,ch:8,v1:28,v2:28,en:"romans 8:28"},
+  {label:"예레미야 29:11",category:"소망",bk:24,ch:29,v1:11,v2:11,en:"jeremiah 29:11"},
+  {label:"고린도전서 13:4-7",category:"사랑",bk:46,ch:13,v1:4,v2:7,en:"1 corinthians 13:4-7"},
+  {label:"시편 119:105",category:"지혜",bk:19,ch:119,v1:105,v2:105,en:"psalm 119:105"},
+  {label:"갈라디아서 2:20",category:"믿음",bk:48,ch:2,v1:20,v2:20,en:"galatians 2:20"},
+  {label:"베드로전서 5:7",category:"위로",bk:60,ch:5,v1:7,v2:7,en:"1 peter 5:7"},
+  {label:"이사야 40:31",category:"소망",bk:23,ch:40,v1:31,v2:31,en:"isaiah 40:31"},
+  {label:"시편 27:1",category:"믿음",bk:19,ch:27,v1:1,v2:1,en:"psalm 27:1"},
+  {label:"빌립보서 4:19",category:"소망",bk:50,ch:4,v1:19,v2:19,en:"philippians 4:19"},
+  {label:"마태복음 28:20",category:"믿음",bk:40,ch:28,v1:20,v2:20,en:"matthew 28:20"},
+  {label:"요한복음 14:6",category:"믿음",bk:43,ch:14,v1:6,v2:6,en:"john 14:6"},
+  {label:"시편 121:1-2",category:"위로",bk:19,ch:121,v1:1,v2:2,en:"psalm 121:1-2"},
+  {label:"히브리서 11:1",category:"믿음",bk:58,ch:11,v1:1,v2:1,en:"hebrews 11:1"},
+  {label:"로마서 12:2",category:"지혜",bk:45,ch:12,v1:2,v2:2,en:"romans 12:2"},
+  {label:"에베소서 2:8",category:"은혜",bk:49,ch:2,v1:8,v2:8,en:"ephesians 2:8"},
+  {label:"시편 37:4",category:"소망",bk:19,ch:37,v1:4,v2:4,en:"psalm 37:4"},
+  {label:"데살로니가전서 5:16-18",category:"감사",bk:52,ch:5,v1:16,v2:18,en:"1 thessalonians 5:16-18"},
+  {label:"야고보서 1:5",category:"지혜",bk:59,ch:1,v1:5,v2:5,en:"james 1:5"},
+  {label:"요한일서 4:7",category:"사랑",bk:62,ch:4,v1:7,v2:7,en:"1 john 4:7"},
+  {label:"마태복음 5:16",category:"믿음",bk:40,ch:5,v1:16,v2:16,en:"matthew 5:16"},
+  {label:"잠언 16:3",category:"지혜",bk:20,ch:16,v1:3,v2:3,en:"proverbs 16:3"},
+  {label:"디모데후서 1:7",category:"믿음",bk:55,ch:1,v1:7,v2:7,en:"2 timothy 1:7"},
+  {label:"시편 91:1-2",category:"위로",bk:19,ch:91,v1:1,v2:2,en:"psalm 91:1-2"},
+  {label:"미가 6:8",category:"지혜",bk:33,ch:6,v1:8,v2:8,en:"micah 6:8"},
+  {label:"시편 16:11",category:"소망",bk:19,ch:16,v1:11,v2:11,en:"psalm 16:11"},
+  {label:"요한복음 8:12",category:"소망",bk:43,ch:8,v1:12,v2:12,en:"john 8:12"}
+];
+let CATEGORIES=["전체","위로","감사","믿음","사랑","지혜","소망","기도","찬양","은혜","절기"];
+// 인라인 fallback — 66권 매핑. data/bible_books.json 로드 실패해도 자유 입력이 동작
+let BOOK_LIST=[
+  {bk:1,ko:"창세기",en:"genesis",aliases:["창"]},{bk:2,ko:"출애굽기",en:"exodus",aliases:["출"]},
+  {bk:3,ko:"레위기",en:"leviticus",aliases:["레"]},{bk:4,ko:"민수기",en:"numbers",aliases:["민"]},
+  {bk:5,ko:"신명기",en:"deuteronomy",aliases:["신"]},{bk:6,ko:"여호수아",en:"joshua",aliases:["수"]},
+  {bk:7,ko:"사사기",en:"judges",aliases:["삿"]},{bk:8,ko:"룻기",en:"ruth",aliases:["룻"]},
+  {bk:9,ko:"사무엘상",en:"1 samuel",aliases:["삼상"]},{bk:10,ko:"사무엘하",en:"2 samuel",aliases:["삼하"]},
+  {bk:11,ko:"열왕기상",en:"1 kings",aliases:["왕상"]},{bk:12,ko:"열왕기하",en:"2 kings",aliases:["왕하"]},
+  {bk:13,ko:"역대상",en:"1 chronicles",aliases:["대상"]},{bk:14,ko:"역대하",en:"2 chronicles",aliases:["대하"]},
+  {bk:15,ko:"에스라",en:"ezra",aliases:["스"]},{bk:16,ko:"느헤미야",en:"nehemiah",aliases:["느"]},
+  {bk:17,ko:"에스더",en:"esther",aliases:["에"]},{bk:18,ko:"욥기",en:"job",aliases:["욥"]},
+  {bk:19,ko:"시편",en:"psalms",aliases:["시"]},{bk:20,ko:"잠언",en:"proverbs",aliases:["잠"]},
+  {bk:21,ko:"전도서",en:"ecclesiastes",aliases:["전"]},{bk:22,ko:"아가",en:"song of solomon",aliases:["아"]},
+  {bk:23,ko:"이사야",en:"isaiah",aliases:["사"]},{bk:24,ko:"예레미야",en:"jeremiah",aliases:["렘"]},
+  {bk:25,ko:"예레미야애가",en:"lamentations",aliases:["애"]},{bk:26,ko:"에스겔",en:"ezekiel",aliases:["겔"]},
+  {bk:27,ko:"다니엘",en:"daniel",aliases:["단"]},{bk:28,ko:"호세아",en:"hosea",aliases:["호"]},
+  {bk:29,ko:"요엘",en:"joel",aliases:["욜"]},{bk:30,ko:"아모스",en:"amos",aliases:["암"]},
+  {bk:31,ko:"오바댜",en:"obadiah",aliases:["옵"]},{bk:32,ko:"요나",en:"jonah",aliases:["욘"]},
+  {bk:33,ko:"미가",en:"micah",aliases:["미"]},{bk:34,ko:"나훔",en:"nahum",aliases:["나"]},
+  {bk:35,ko:"하박국",en:"habakkuk",aliases:["합"]},{bk:36,ko:"스바냐",en:"zephaniah",aliases:["습"]},
+  {bk:37,ko:"학개",en:"haggai",aliases:["학"]},{bk:38,ko:"스가랴",en:"zechariah",aliases:["슥"]},
+  {bk:39,ko:"말라기",en:"malachi",aliases:["말"]},{bk:40,ko:"마태복음",en:"matthew",aliases:["마","마태"]},
+  {bk:41,ko:"마가복음",en:"mark",aliases:["막","마가"]},{bk:42,ko:"누가복음",en:"luke",aliases:["눅","누가"]},
+  {bk:43,ko:"요한복음",en:"john",aliases:["요","요한"]},{bk:44,ko:"사도행전",en:"acts",aliases:["행"]},
+  {bk:45,ko:"로마서",en:"romans",aliases:["롬"]},{bk:46,ko:"고린도전서",en:"1 corinthians",aliases:["고전"]},
+  {bk:47,ko:"고린도후서",en:"2 corinthians",aliases:["고후"]},{bk:48,ko:"갈라디아서",en:"galatians",aliases:["갈"]},
+  {bk:49,ko:"에베소서",en:"ephesians",aliases:["엡"]},{bk:50,ko:"빌립보서",en:"philippians",aliases:["빌"]},
+  {bk:51,ko:"골로새서",en:"colossians",aliases:["골"]},{bk:52,ko:"데살로니가전서",en:"1 thessalonians",aliases:["살전"]},
+  {bk:53,ko:"데살로니가후서",en:"2 thessalonians",aliases:["살후"]},{bk:54,ko:"디모데전서",en:"1 timothy",aliases:["딤전"]},
+  {bk:55,ko:"디모데후서",en:"2 timothy",aliases:["딤후"]},{bk:56,ko:"디도서",en:"titus",aliases:["딛"]},
+  {bk:57,ko:"빌레몬서",en:"philemon",aliases:["몬"]},{bk:58,ko:"히브리서",en:"hebrews",aliases:["히"]},
+  {bk:59,ko:"야고보서",en:"james",aliases:["약"]},{bk:60,ko:"베드로전서",en:"1 peter",aliases:["벧전"]},
+  {bk:61,ko:"베드로후서",en:"2 peter",aliases:["벧후"]},{bk:62,ko:"요한일서",en:"1 john",aliases:["요일"]},
+  {bk:63,ko:"요한이서",en:"2 john",aliases:["요이"]},{bk:64,ko:"요한삼서",en:"3 john",aliases:["요삼"]},
+  {bk:65,ko:"유다서",en:"jude",aliases:["유"]},{bk:66,ko:"요한계시록",en:"revelation",aliases:["계","계시록"]}
 ];
 const VER_NAME={kor_rev:"개역개정",kor_easy:"쉬운성경",niv:"NIV",kor_hangul:"개역한글",web:"WEB",kjv:"KJV"};
+// 퍼블릭 도메인 본문 캐시 (data/texts_kjv.json, data/texts_web.json) — 키:ref.en, 값:본문
+let TEXT_KJV = {};
+let TEXT_WEB = {};
+
+// data/ 폴더의 JSON을 비동기로 로드해서 REFS/CATEGORIES/BOOK_LIST/TEXT_*를 풍부한 버전으로 교체
+async function loadBibleData(){
+  try{
+    const [vRes,bRes,kRes,wRes]=await Promise.allSettled([
+      fetch("data/verses.json",{cache:"no-cache"}),
+      fetch("data/bible_books.json",{cache:"no-cache"}),
+      fetch("data/texts_kjv.json",{cache:"no-cache"}),
+      fetch("data/texts_web.json",{cache:"no-cache"})
+    ]);
+    if(vRes.status==="fulfilled" && vRes.value.ok){
+      const j=await vRes.value.json();
+      if(Array.isArray(j.verses) && j.verses.length) REFS=j.verses;
+      if(Array.isArray(j.categories) && j.categories.length) CATEGORIES=j.categories;
+    }
+    if(bRes.status==="fulfilled" && bRes.value.ok){
+      const j=await bRes.value.json();
+      if(Array.isArray(j.books) && j.books.length) BOOK_LIST=j.books;
+    }
+    if(kRes.status==="fulfilled" && kRes.value.ok){
+      try{ const j=await kRes.value.json(); if(j&&typeof j==="object") TEXT_KJV=j; }catch(_){}
+    }
+    if(wRes.status==="fulfilled" && wRes.value.ok){
+      try{ const j=await wRes.value.json(); if(j&&typeof j==="object") TEXT_WEB=j; }catch(_){}
+    }
+  }catch(e){ /* fallback 유지 */ }
+}
+
+function buildBibleCats(){
+  const sel=$("#bibleCat"); if(!sel) return;
+  sel.innerHTML="";
+  CATEGORIES.forEach(c=>{
+    const o=document.createElement("option"); o.value=c; o.textContent=c;
+    sel.appendChild(o);
+  });
+}
 function buildBibleRefs(){
-  const sel=$("#bibleRef"); if(!sel||sel.childElementCount) return;
+  const sel=$("#bibleRef"); if(!sel) return;
+  const cat=($("#bibleCat")&&$("#bibleCat").value)||"전체";
+  sel.innerHTML="";
   REFS.forEach((r,i)=>{
+    if(cat!=="전체" && r.category && r.category!==cat) return;
     const o=document.createElement("option"); o.value=i; o.textContent=r.label;
     sel.appendChild(o);
   });
 }
-async function fetchVerse(){
+
+// "창세기 1:1", "마 5:3-10", "1 corinthians 13:4", "요한복음 3장 16절" 같은 자유 입력을 파싱
+function parseManualRef(text){
+  if(!text) return null;
+  const s=text.trim().replace(/\s+/g," ");
+  const m=s.match(/^(.+?)\s*(\d+)\s*[:장]\s*(\d+)(?:\s*[-~–]\s*(\d+))?\s*절?\s*$/);
+  if(!m) return null;
+  const namePart=m[1].trim().toLowerCase();
+  const ch=+m[2], v1=+m[3], v2=m[4]?+m[4]:v1;
+  if(!ch||!v1||v2<v1) return null;
+  const norm=x=>String(x||"").trim().toLowerCase();
+  let found=null;
+  for(const b of BOOK_LIST){
+    const cands=[norm(b.ko),norm(b.en),...(b.aliases||[]).map(norm)];
+    if(cands.includes(namePart)){ found=b; break; }
+  }
+  if(!found){
+    // prefix 매칭(예: "고린도" → 고린도전서 먼저 일치하지만 그 정도면 OK)
+    for(const b of BOOK_LIST){
+      const cands=[norm(b.ko),norm(b.en),...(b.aliases||[]).map(norm)];
+      if(cands.some(c=>c && (c.startsWith(namePart)||namePart.startsWith(c)))){ found=b; break; }
+    }
+  }
+  if(!found) return null;
+  const range=v2>v1?`${v1}-${v2}`:`${v1}`;
+  return {
+    label:`${found.ko} ${ch}:${range}`,
+    bk:found.bk, ch, v1, v2,
+    en:`${found.en} ${ch}:${range}`
+  };
+}
+
+async function fetchVerseByRef(ref){
   const ver=$("#bibleVer").value;
-  const ref=REFS[+$("#bibleRef").value]; if(!ref) return;
+  if(!ref) return;
   const tag=`${ref.label} (${VER_NAME[ver]})`;
   if(ver==="kor_rev"||ver==="kor_easy"||ver==="niv"){
     $("#refText").value=tag;
+    showTab("text");
     status(`${VER_NAME[ver]}은(는) 저작권 보호로 본문 자동 불러오기가 불가합니다. 성경에서 본문을 직접 붙여넣어 주세요. (참조는 자동 입력됨)`,"err");
     $("#mainText").focus(); save(); render(); return;
+  }
+  // 퍼블릭 도메인 번역은 로컬 캐시(data/texts_*.json) 먼저 조회 → 오프라인에서도 즉시 채움
+  if(ver==="kjv" || ver==="web"){
+    const store = (ver==="kjv") ? TEXT_KJV : TEXT_WEB;
+    const cached = store && store[ref.en];
+    if(cached){
+      $("#mainText").value = cached;
+      $("#refText").value = tag;
+      showTab("text");
+      status("구절을 불러왔습니다 (로컬 본문).","ok");
+      save(); render(); return;
+    }
   }
   status('<span class="spin"></span>구절 불러오는 중…');
   try{
@@ -698,6 +1041,7 @@ async function fetchVerse(){
     if(!text) throw new Error("empty");
     $("#mainText").value=text;
     $("#refText").value=tag;
+    showTab("text");
     status("구절을 불러왔습니다.","ok");
     save(); render();
   }catch(e){
@@ -706,7 +1050,23 @@ async function fetchVerse(){
     save(); render();
   }
 }
+function fetchVerse(){
+  const ref=REFS[+$("#bibleRef").value];
+  if(!ref){ status("먼저 카테고리에서 구절을 선택하거나 ‘직접 입력’ 칸을 사용해 주세요.","err"); return; }
+  return fetchVerseByRef(ref);
+}
 $("#bibleFetch").onclick=fetchVerse;
+$("#bibleManualFetch").onclick=()=>{
+  const txt=($("#bibleManual").value||"").trim();
+  if(!txt){ status("구절을 입력해 주세요. 예: 창세기 1:1","err"); return; }
+  const ref=parseManualRef(txt);
+  if(!ref){ status("입력 형식을 확인해 주세요. 예: ‘창세기 1:1’ 또는 ‘마 5:3-10’","err"); return; }
+  fetchVerseByRef(ref);
+};
+$("#bibleManual").addEventListener("keydown",e=>{
+  if(e.key==="Enter"){ e.preventDefault(); $("#bibleManualFetch").click(); }
+});
+$("#bibleCat").onchange=()=>{ buildBibleRefs(); save(); };
 $("#bibleVer").onchange=save;
 $("#bibleRef").onchange=save;
 
@@ -1145,6 +1505,50 @@ async function draw(){
     ctx.fillText(state.sticker, sx, sy);
     ctx.restore();
   }
+
+  // 서명 / 로고 (하단 모서리, 맨 위)
+  drawBranding(W,H,isFrame);
+}
+
+function drawBranding(W,H,isFrame){
+  const text=(state.brandText||"").trim();
+  const logo=brandLogoImg;
+  if(!text && !logo) return;
+  const margin=Math.round(W*0.045);
+  const fs=Math.max(11, Math.round(W*((state.brandSize||28)/1000)));
+  const isLeft=(state.brandPos||"right")==="left";
+  const col=isFrame ? "#3a3f4a" : "#ffffff";
+
+  ctx.save();
+  ctx.globalAlpha=0.9;
+  let logoW=0, logoH=0;
+  if(logo && logo.width && logo.height){
+    logoH=Math.round(fs*1.7);
+    logoW=Math.round(logoH*(logo.width/logo.height));
+  }
+  ctx.font=`600 ${fs}px "${state.font}","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif`;
+  const textW=text?ctx.measureText(text).width:0;
+  const gap=(text && logoW)?Math.round(fs*0.4):0;
+  const totalW=logoW+gap+textW;
+  const x0=isLeft ? margin : Math.max(margin, W-margin-totalW);
+  const baseY=H-margin;
+
+  if(logo && logoW){
+    const ly=baseY-logoH;
+    if(!isFrame){ ctx.shadowColor="rgba(0,0,0,.45)"; ctx.shadowBlur=Math.round(fs*0.25); ctx.shadowOffsetY=1; }
+    ctx.drawImage(logo, x0, ly, logoW, logoH);
+    ctx.shadowColor="transparent";
+  }
+  if(text){
+    ctx.textAlign="left"; ctx.textBaseline="alphabetic";
+    ctx.fillStyle=col;
+    if(!isFrame){ ctx.shadowColor="rgba(0,0,0,.55)"; ctx.shadowBlur=Math.round(fs*0.3); ctx.shadowOffsetY=1; }
+    const tx=x0+logoW+gap;
+    const ty=logoH ? (baseY-(logoH-fs)/2 - Math.round(fs*0.15)) : baseY;
+    ctx.fillText(text, tx, ty);
+    ctx.shadowColor="transparent";
+  }
+  ctx.restore();
 }
 function roundRect(x,y,w,h,r){ roundRectPath(x,y,w,h,r); }
 function roundRectPath(x,y,w,h,r){
@@ -1160,7 +1564,7 @@ function roundRectPath(x,y,w,h,r){
 /* ---------- 저장 / 공유 ---------- */
 function canvasBlob(){ return new Promise(res=>cv.toBlob(res,"image/png")); }
 function fileName(){
-  const r=($("#refText").value||"말씀카드").replace(/[\\/:*?"<>|]/g,"").trim().slice(0,24)||"말씀카드";
+  const r=($("#refText").value||"굿메세지").replace(/[\\/:*?"<>|]/g,"").trim().slice(0,24)||"굿메세지";
   return r+".png";
 }
 $("#dlBtn").onclick=async()=>{
@@ -1180,13 +1584,45 @@ $("#shareBtn").onclick=async()=>{
     const b=await canvasBlob();
     const file=new File([b],fileName(),{type:"image/png"});
     if(navigator.canShare&&navigator.canShare({files:[file]})){
-      await navigator.share({files:[file],title:"말씀카드"});
+      await navigator.share({files:[file],title:"굿메세지"});
       status("공유했습니다.","ok");
     }else{
       $("#dlBtn").click();
       status("이 기기는 공유를 지원하지 않아 저장했습니다.","ok");
     }
-  }catch(e){ status("공유가 취소되었습니다."); }
+  }catch(e){
+    if(e && (e.name==="AbortError"||/cancel|abort/i.test(e.message||""))) status("공유가 취소되었습니다.");
+    else status("공유 실패: "+(e&&(e.message||e.name)||"알 수 없는 오류")+" — ‘복사’ 또는 ‘PNG 저장’을 사용해 보세요.","err");
+  }
+};
+
+// 이미지를 클립보드에 직접 복사 — OS 공유 시트의 ‘복사’가 동작하지 않을 때 안정적인 대체 경로
+$("#copyBtn").onclick=async()=>{
+  try{
+    if(!navigator.clipboard || !window.ClipboardItem){
+      status("이 브라우저는 이미지 복사를 지원하지 않습니다. ‘PNG 저장’ 후 사진 앱에서 복사해 주세요.","err");
+      return;
+    }
+    // 일부 브라우저(Safari)는 사용자 클릭 즉시 ClipboardItem(Promise<Blob>)을 요구함 → 동기적 ClipboardItem 생성
+    const blobPromise = canvasBlob();
+    const item = new ClipboardItem({"image/png": blobPromise});
+    await navigator.clipboard.write([item]);
+    status("이미지를 클립보드에 복사했습니다. 카카오톡·메모 등에 ‘붙여넣기’ 하세요.","ok");
+  }catch(e){
+    // ClipboardItem(Promise) 미지원 브라우저 폴백 — 먼저 blob을 만든 뒤 다시 시도
+    try{
+      const b=await canvasBlob();
+      await navigator.clipboard.write([new ClipboardItem({"image/png": b})]);
+      status("이미지를 클립보드에 복사했습니다.","ok");
+      return;
+    }catch(e2){
+      const m=(e2&&(e2.message||e2.name))||"";
+      if(/not allowed|permission|focused|user activation|secure/i.test(m))
+        status("복사 권한이 거부되었습니다. 페이지를 클릭한 뒤 다시 시도하거나, ‘PNG 저장’을 사용해 주세요.","err");
+      else
+        status("복사 실패: "+m+" — ‘PNG 저장’으로 대신 받아 주세요.","err");
+    }
+  }
 };
 
 $("#resetAll").onclick=()=>{
@@ -1195,11 +1631,147 @@ $("#resetAll").onclick=()=>{
   }
 };
 
+/* ================= ⑤ 신앙 위인 명언 + 일괄 PNG ZIP ================= */
+// 인라인 fallback — data/quotes.json 로드 실패 시(file:// 등)에도 일부는 동작
+let QUOTES = [
+  {text:"주님은 주님을 향하도록 우리를 지으셨으니, 우리 마음이 주님 안에서 쉴 때까지는 안식이 없나이다.", author:"아우구스티누스", note:"고백록"},
+  {text:"고통은 귀먹은 세상을 깨우시는 하나님의 확성기다.", author:"C.S. 루이스", note:"고통의 문제"},
+  {text:"하나님께 큰 일을 기대하라. 하나님을 위하여 큰 일을 시도하라.", author:"윌리엄 캐리", note:""},
+  {text:"잃을 수 없는 것을 얻기 위하여 지킬 수 없는 것을 버리는 사람은 결코 어리석지 않다.", author:"짐 엘리엇", note:""},
+  {text:"값싼 은혜는 우리 교회의 치명적인 원수다.", author:"디트리히 본회퍼", note:"나를 따르라"},
+  {text:"우리는 큰 일을 할 수 없습니다. 다만 큰 사랑으로 작은 일을 할 수 있을 뿐입니다.", author:"마더 테레사", note:""}
+];
+let bulkCancelled = false;
+
+function escapeHtml(s){
+  return String(s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+}
+async function loadQuotes(){
+  try{
+    const r=await fetch("data/quotes.json",{cache:"no-cache"});
+    if(r.ok){ const j=await r.json(); if(j && Array.isArray(j.quotes) && j.quotes.length) QUOTES=j.quotes; }
+  }catch(_){ /* fallback 유지 */ }
+}
+function filteredQuotes(){
+  const q=(($("#quoteSearch")&&$("#quoteSearch").value)||"").trim().toLowerCase();
+  if(!q) return QUOTES.slice();
+  return QUOTES.filter(v=>((v.text||"")+" "+(v.author||"")+" "+(v.note||"")).toLowerCase().includes(q));
+}
+function fillCardFromQuote(text, author){
+  $("#mainText").value = text;
+  $("#refText").value = author || "";
+  showTab("text");
+  save(); render();
+  status("명언을 카드에 채웠습니다.","ok");
+}
+function renderQuotes(){
+  const wrap=$("#quoteList"); if(!wrap) return;
+  const list=filteredQuotes();
+  if($("#quoteCount")) $("#quoteCount").textContent = list.length;
+  if(!list.length){ wrap.innerHTML='<div class="empty">검색 결과가 없습니다.</div>'; return; }
+  wrap.innerHTML="";
+  list.forEach(v=>{
+    const it=document.createElement("div"); it.className="item";
+    it.innerHTML = `<div class="t">${escapeHtml(v.text)}<div class="r">— ${escapeHtml(v.author||"")}${v.note?` · ${escapeHtml(v.note)}`:""}</div></div>`;
+    it.onclick=()=>fillCardFromQuote(v.text, v.author);
+    wrap.appendChild(it);
+  });
+}
+$("#quoteSearch").oninput = renderQuotes;
+
+// JSZip CDN 지연 로드 (PWA 첫 사용 후엔 브라우저 캐시)
+async function ensureJSZip(){
+  if(window.JSZip) return;
+  await new Promise((res,rej)=>{
+    const s=document.createElement("script");
+    s.src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
+    s.onload=res;
+    s.onerror=()=>rej(new Error("JSZip을 불러오지 못했습니다 — 인터넷 연결 확인 후 다시 시도해 주세요"));
+    document.head.appendChild(s);
+  });
+}
+function sanitizeFn(s){ return String(s||"").replace(/[\\/:*?"<>|\n\r\t]/g,"").trim().slice(0,40) || "card"; }
+function setBulkProg(pct, msg){
+  $("#bulkProg").style.display="block";
+  $("#bulkProg .bulk-bar span").style.width = Math.max(0,Math.min(100,pct))+"%";
+  $("#bulkProg .bulk-msg").textContent = msg;
+}
+function nextFrame(){ return new Promise(r=>requestAnimationFrame(()=>r())); }
+
+async function bulkGenerate(){
+  const list = filteredQuotes();
+  if(!list.length){ status("생성할 명언이 없습니다. 검색을 비우거나 다른 검색어를 써 보세요.","err"); return; }
+  try{
+    setBulkProg(0,"JSZip 로딩 중…");
+    await ensureJSZip();
+  }catch(e){ status(e.message,"err"); $("#bulkProg").style.display="none"; return; }
+
+  bulkCancelled=false;
+  $("#bulkGen").disabled = true;
+  $("#bulkCancel").disabled = false;
+
+  const zip = new JSZip();
+  const total = list.length;
+  const savedMain = $("#mainText").value;
+  const savedRef = $("#refText").value;
+  const pad = String(total).length;
+  let done=0, ok=0, fail=0;
+
+  try{
+    for(let i=0;i<total;i++){
+      if(bulkCancelled) break;
+      const v = list[i];
+      $("#mainText").value = v.text;
+      $("#refText").value = v.author || "";
+      render();
+      await nextFrame(); await nextFrame();
+      try{
+        const blob = await canvasBlob();
+        if(!blob) throw new Error("blob null");
+        const idx = String(i+1).padStart(pad,"0");
+        const baseName = sanitizeFn(v.author || v.text.slice(0,30));
+        zip.file(`${idx}-${baseName}.png`, blob);
+        ok++;
+      }catch(_){ fail++; }
+      done++;
+      setBulkProg(done/total*100, `${done} / ${total}장 생성 중… (성공 ${ok} · 실패 ${fail})`);
+      if((done % 4)===0) await nextFrame();
+    }
+
+    if(!bulkCancelled && ok>0){
+      setBulkProg(100,"ZIP 묶는 중…");
+      const blob = await zip.generateAsync({type:"blob", compression:"DEFLATE", compressionOptions:{level:6}});
+      const ts = new Date().toISOString().replace(/[:T]/g,"-").slice(0,16);
+      const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`굿메세지-${ok}장-${ts}.zip`;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+      status(`완료: ${ok}장을 ZIP으로 저장했습니다.`,"ok");
+    } else if(bulkCancelled){
+      status(`취소됨. ${done}장까지 처리했습니다.`,"err");
+    } else {
+      status("모든 카드 생성에 실패했습니다. 배경/글꼴을 바꾸고 다시 시도해 주세요.","err");
+    }
+  } finally {
+    $("#mainText").value = savedMain;
+    $("#refText").value = savedRef;
+    render();
+    $("#bulkGen").disabled = false;
+    $("#bulkCancel").disabled = true;
+    setTimeout(()=>{ $("#bulkProg").style.display="none"; }, 4000);
+  }
+}
+$("#bulkGen").onclick = bulkGenerate;
+$("#bulkCancel").onclick = ()=>{ bulkCancelled = true; };
+
 /* ---------- 시작 ---------- */
 (async function init(){
   buildSampleGrid();
+  await loadBibleData();
+  buildBibleCats();
   buildBibleRefs();
   buildDeco();
+  await loadQuotes();
+  renderQuotes();
   restore();
   if(!$("#aiPrompt").value.trim()) buildAIPrompt();
   if(!$("#mainText").value.trim()){
@@ -1211,6 +1783,17 @@ $("#resetAll").onclick=()=>{
   render();
 })();
 window.addEventListener("resize",()=>render());
+
+/* ---------- 전역 오류 표시 (편집 중 오류를 화면 상태 줄에 보여 줌) ---------- */
+function showGlobalError(label, err){
+  try{
+    const msg = err && (err.message || err.reason && (err.reason.message||err.reason) || err.name) || String(err||"");
+    if(typeof status==="function") status("⚠️ "+label+": "+msg+" — 새로고침하거나 다른 메뉴를 시도해 보세요.","err");
+    console.error("["+label+"]", err);
+  }catch(_){}
+}
+window.addEventListener("error", e => showGlobalError("앱 오류", e.error||e));
+window.addEventListener("unhandledrejection", e => showGlobalError("비동기 오류", e.reason||e));
 
 /* ---------- 휴대폰 앱(PWA): 오프라인 서비스워커 등록 ---------- */
 if("serviceWorker"in navigator && location.protocol.startsWith("http")){
