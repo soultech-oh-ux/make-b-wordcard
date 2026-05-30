@@ -1,5 +1,5 @@
 /* 굿메세지 - 서비스워커 (오프라인 지원) */
-const CACHE = "wordcard-v7";
+const CACHE = "wordcard-v8";
 const SHELL = [
   "./",
   "./index.html",
@@ -10,7 +10,8 @@ const SHELL = [
   "./data/bible_books.json",
   "./data/texts_kjv.json",
   "./data/texts_web.json",
-  "./data/quotes.json"
+  "./data/quotes.json",
+  "./data/kkbible-word200.json"
 ];
 
 self.addEventListener("install", e => {

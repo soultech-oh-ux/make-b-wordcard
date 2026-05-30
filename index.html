@@ -361,7 +361,7 @@
       <h2 class="sec">성경 구절 가져오기</h2>
       <label>번역본</label>
       <select id="bibleVer">
-        <option value="kor_rev">개역개정 (참조만 자동 · 본문 직접입력)</option>
+        <option value="kor_rev">개역개정 (수록 70구절 본문 자동 · 나머지는 직접입력)</option>
         <option value="kor_easy">쉬운성경 (참조만 자동 · 본문 직접입력)</option>
         <option value="niv">NIV (참조만 자동 · 본문 직접입력)</option>
         <option value="kor_hangul">개역한글 (무료 · 본문 자동)</option>
@@ -379,7 +379,7 @@
         <input type="text" id="bibleManual" style="flex:1" placeholder="원하는 책 장:절을 자유롭게 입력" />
         <button class="btn alt" id="bibleManualFetch" style="flex:0 0 104px">가져오기</button>
       </div>
-      <p class="hint">불러온 구절은 ① <b>굿메세지</b> 칸에 채워집니다. 개역개정·NIV·쉬운성경은 저작권 보호로 참조만 자동 입력되니 본문은 직접 붙여넣어 주세요. 개역한글·WEB·KJV는 본문까지 자동으로 채워집니다.</p>
+      <p class="hint">불러온 구절은 ① <b>굿메세지</b> 칸에 채워집니다. <b>개역개정</b>은 수록된 70구절은 본문이 자동 채워지고 그 외는 직접 붙여넣어 주세요. <b>NIV·쉬운성경</b>은 저작권 보호로 참조만 자동 입력됩니다. <b>개역한글·WEB·KJV</b>는 본문까지 자동으로 채워집니다.</p>
 
       <h2 class="sec" style="margin-top:18px">신앙 위인 명언 (<span id="quoteCount">0</span>)</h2>
       <p class="hint">신앙으로 살아온 인물들의 명언 모음입니다. 명언을 <b>탭하면 ① 굿메세지 칸에 채워집니다.</b> 검색으로 인물·내용을 좁힐 수 있어요. 명언은 출처가 불확실할 수 있으니 사용 전 확인을 권장합니다.</p>
@@ -920,15 +920,18 @@ const VER_NAME={kor_rev:"개역개정",kor_easy:"쉬운성경",niv:"NIV",kor_han
 // 퍼블릭 도메인 본문 캐시 (data/texts_kjv.json, data/texts_web.json) — 키:ref.en, 값:본문
 let TEXT_KJV = {};
 let TEXT_WEB = {};
+// 개역개정 본문 캐시 (data/kkbible-word200.json의 verses[].text) — 키:ref.en, 값:본문. 사용자가 개인 자료로 업로드.
+let TEXT_KOR_REV = {};
 
 // data/ 폴더의 JSON을 비동기로 로드해서 REFS/CATEGORIES/BOOK_LIST/TEXT_*를 풍부한 버전으로 교체
 async function loadBibleData(){
   try{
-    const [vRes,bRes,kRes,wRes]=await Promise.allSettled([
+    const [vRes,bRes,kRes,wRes,kkRes]=await Promise.allSettled([
       fetch("data/verses.json",{cache:"no-cache"}),
       fetch("data/bible_books.json",{cache:"no-cache"}),
       fetch("data/texts_kjv.json",{cache:"no-cache"}),
-      fetch("data/texts_web.json",{cache:"no-cache"})
+      fetch("data/texts_web.json",{cache:"no-cache"}),
+      fetch("data/kkbible-word200.json",{cache:"no-cache"})
     ]);
     if(vRes.status==="fulfilled" && vRes.value.ok){
       const j=await vRes.value.json();
@@ -944,6 +947,14 @@ async function loadBibleData(){
     }
     if(wRes.status==="fulfilled" && wRes.value.ok){
       try{ const j=await wRes.value.json(); if(j&&typeof j==="object") TEXT_WEB=j; }catch(_){}
+    }
+    if(kkRes.status==="fulfilled" && kkRes.value.ok){
+      try{
+        const j=await kkRes.value.json();
+        if(j && Array.isArray(j.verses)){
+          j.verses.forEach(v=>{ if(v && v.en && v.text) TEXT_KOR_REV[v.en]=v.text; });
+        }
+      }catch(_){}
     }
   }catch(e){ /* fallback 유지 */ }
 }
@@ -1002,7 +1013,23 @@ async function fetchVerseByRef(ref){
   const ver=$("#bibleVer").value;
   if(!ref) return;
   const tag=`${ref.label} (${VER_NAME[ver]})`;
-  if(ver==="kor_rev"||ver==="kor_easy"||ver==="niv"){
+  // 개역개정 — 사용자가 업로드한 data/kkbible-word200.json 캐시 우선 조회
+  if(ver==="kor_rev"){
+    const cached = TEXT_KOR_REV && TEXT_KOR_REV[ref.en];
+    if(cached){
+      $("#mainText").value = cached;
+      $("#refText").value = tag;
+      showTab("text");
+      status("구절을 불러왔습니다 (개역개정 · 로컬 본문).","ok");
+      save(); render(); return;
+    }
+    // 캐시에 없으면 기존 안내(참조만)
+    $("#refText").value=tag;
+    showTab("text");
+    status("이 구절은 개역개정 로컬 본문에 없습니다. 본문은 직접 붙여넣어 주세요. (참조는 자동 입력됨)","err");
+    $("#mainText").focus(); save(); render(); return;
+  }
+  if(ver==="kor_easy"||ver==="niv"){
     $("#refText").value=tag;
     showTab("text");
     status(`${VER_NAME[ver]}은(는) 저작권 보호로 본문 자동 불러오기가 불가합니다. 성경에서 본문을 직접 붙여넣어 주세요. (참조는 자동 입력됨)`,"err");
