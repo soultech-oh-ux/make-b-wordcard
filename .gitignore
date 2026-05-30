@@ -8,3 +8,7 @@ claude.cmd
 .claude/
 .vercel/
 node_modules/
+
+# 외부 참고 자료 (helloao API 소스, 우리는 https://bible.helloao.org/api/ 만 사용)
+bible-api-main/
+bible-api-main.zip

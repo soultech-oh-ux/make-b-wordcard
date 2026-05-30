@@ -1,5 +1,5 @@
 /* 굿메세지 - 서비스워커 (오프라인 지원) */
-const CACHE = "wordcard-v8";
+const CACHE = "wordcard-v10";
 const SHELL = [
   "./",
   "./index.html",

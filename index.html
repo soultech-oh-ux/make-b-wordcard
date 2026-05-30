@@ -166,7 +166,7 @@
     <div class="panel" data-panel="bg">
       <h2 class="sec">배경 이미지</h2>
       <div class="tabs" id="srcTabs">
-        <div class="tab on" data-src="sample">샘플 50</div>
+        <div class="tab on" data-src="sample">샘플 120</div>
         <div class="tab" data-src="ai">무료 AI</div>
         <div class="tab" data-src="upload">내 사진</div>
         <div class="tab" data-src="search">사진검색</div>
@@ -175,9 +175,10 @@
 
       <!-- 샘플 배경 -->
       <div class="panel on" data-src-panel="sample">
-        <label>배경 선택 (탭하면 적용) · 풍경 20 + 패턴 30</label>
+        <label>배경 선택 (탭하면 적용) · 풍경 20 + 패턴 30 + 절기 70</label>
+        <div class="chips" id="sampleCatChips" style="margin-bottom:8px"></div>
         <div class="samples" id="sampleGrid"></div>
-        <p class="hint">앞쪽 20종은 <b>사진풍 풍경</b>(노을·바다·들판·숲·밤하늘), 뒤쪽 30종은 패턴 배경입니다. 모두 앱이 직접 그려 인터넷 없이 즉시 적용됩니다. <b>실제 사진</b>을 쓰려면 위 ‘사진검색’ 또는 ‘무료 AI’ 탭을 이용하세요.</p>
+        <p class="hint">앞쪽 50종은 풍경·패턴, 뒤쪽 70종은 <b>절기 배경</b>(사순절·고난주간·부활절·성령강림·추수감사·대림절·성탄절 각 10종)입니다. 모두 앱이 직접 그려 인터넷 없이 즉시 적용됩니다. 위 칩으로 절기별 필터링이 가능합니다.</p>
       </div>
 
       <!-- 무료 AI -->
@@ -338,6 +339,20 @@
       <div class="chips emoji" id="animalChips"></div>
       <h2 class="sec" style="margin-top:18px">성경 · 믿음 상징</h2>
       <div class="chips emoji" id="bibleChips"></div>
+      <h2 class="sec" style="margin-top:18px">사순절</h2>
+      <div class="chips emoji" id="lentChips"></div>
+      <h2 class="sec" style="margin-top:18px">고난주간</h2>
+      <div class="chips emoji" id="holyweekChips"></div>
+      <h2 class="sec" style="margin-top:18px">부활절</h2>
+      <div class="chips emoji" id="easterChips"></div>
+      <h2 class="sec" style="margin-top:18px">성령강림절</h2>
+      <div class="chips emoji" id="pentecostChips"></div>
+      <h2 class="sec" style="margin-top:18px">추수감사절</h2>
+      <div class="chips emoji" id="thanksgivingChips"></div>
+      <h2 class="sec" style="margin-top:18px">대림절</h2>
+      <div class="chips emoji" id="adventChips"></div>
+      <h2 class="sec" style="margin-top:18px">성탄절</h2>
+      <div class="chips emoji" id="christmasChips"></div>
       <div class="btn-row">
         <button class="btn alt" id="stkClear">캐릭터 빼기</button>
       </div>
@@ -361,13 +376,21 @@
       <h2 class="sec">성경 구절 가져오기</h2>
       <label>번역본</label>
       <select id="bibleVer">
-        <option value="kor_rev">개역개정 (수록 70구절 본문 자동 · 나머지는 직접입력)</option>
-        <option value="kor_easy">쉬운성경 (참조만 자동 · 본문 직접입력)</option>
-        <option value="niv">NIV (참조만 자동 · 본문 직접입력)</option>
+        <option value="kor_rev">개역개정 (본문직접입력 · 수록 70구절은 자동)</option>
+        <option value="kor_easy">쉬운성경 (본문직접입력)</option>
+        <option value="niv">NIV (본문직접입력)</option>
         <option value="kor_hangul">개역한글 (무료 · 본문 자동)</option>
         <option value="web">WEB 영문 (무료 · 본문 자동)</option>
         <option value="kjv">KJV 영문 (무료 · 본문 자동)</option>
+        <option value="helloao">🌍 전 세계 번역 (helloao · 1000+ 언어 · 본문 자동)</option>
       </select>
+      <div id="helloaoBox" style="display:none;margin-top:6px">
+        <div class="row" style="margin-bottom:6px">
+          <select id="helloaoLang" style="flex:1"><option value="">언어 선택…</option></select>
+          <select id="helloaoTrans" style="flex:1"><option value="">번역 선택…</option></select>
+        </div>
+        <p class="hint" id="helloaoHint">전 세계 1000+ 언어 · 1256개 번역. 무료 · 키 불필요. 한국어는 “Korean Bible 1910”만 있어 우리 ‘개역한글’과 거의 동일합니다 — 다국어/선교용 추천.</p>
+      </div>
       <label>구절 선택 (카테고리)</label>
       <div class="row" style="margin-bottom:6px">
         <select id="bibleCat" style="flex:0 0 120px"></select>
@@ -380,6 +403,16 @@
         <button class="btn alt" id="bibleManualFetch" style="flex:0 0 104px">가져오기</button>
       </div>
       <p class="hint">불러온 구절은 ① <b>굿메세지</b> 칸에 채워집니다. <b>개역개정</b>은 수록된 70구절은 본문이 자동 채워지고 그 외는 직접 붙여넣어 주세요. <b>NIV·쉬운성경</b>은 저작권 보호로 참조만 자동 입력됩니다. <b>개역한글·WEB·KJV</b>는 본문까지 자동으로 채워집니다.</p>
+
+      <div id="directInputBox" style="display:none;margin-top:14px;border:1px dashed var(--brand);border-radius:10px;padding:10px 12px;background:#f3f7fc">
+        <label style="margin-top:0">본문 직접입력 <span id="directInputRef" style="font-weight:400;color:var(--muted);font-size:12px"></span></label>
+        <textarea id="directInputText" style="min-height:88px" placeholder="성경에서 본문을 복사해 붙여넣거나 직접 입력하세요"></textarea>
+        <div class="btn-row" style="margin-top:8px">
+          <button class="btn" id="directInputApply">본문 적용</button>
+          <button class="btn alt" id="directInputClear" style="flex:.5">지우기</button>
+        </div>
+        <p class="hint" id="directInputHint">개역개정·쉬운성경·NIV는 저작권 보호로 본문을 자동 불러올 수 없습니다. 위 입력칸에 직접 붙여넣고 <b>본문 적용</b>을 누르세요. 참조(<b>장:절 · 번역본명</b>)는 선택한 구절로 자동 입력됩니다.</p>
+      </div>
 
       <h2 class="sec" style="margin-top:18px">신앙 위인 명언 (<span id="quoteCount">0</span>)</h2>
       <p class="hint">신앙으로 살아온 인물들의 명언 모음입니다. 명언을 <b>탭하면 ① 굿메세지 칸에 채워집니다.</b> 검색으로 인물·내용을 좁힐 수 있어요. 명언은 출처가 불확실할 수 있으니 사용 전 확인을 권장합니다.</p>
@@ -450,7 +483,8 @@ let state = {
   searchList:[], searchIdx:0,
   proEngine:"gemini", preset:null,
   sticker:"", stkX:50, stkY:80, stkSize:14,
-  brandText:"", brandPos:"right", brandSize:28, brandLogo:""
+  brandText:"", brandPos:"right", brandSize:28, brandLogo:"",
+  helloaoLang:"", helloaoTrans:""
 };
 let bgImg = null;          // 로드 완료된 Image 객체
 let lastObjectURL = null;
@@ -466,7 +500,8 @@ function save(){
       proPrompt:$("#proPrompt").value,
       bibleVer:$("#bibleVer").value, bibleRef:$("#bibleRef").value,
       bibleCat:($("#bibleCat")&&$("#bibleCat").value)||"전체",
-      bibleManual:($("#bibleManual")&&$("#bibleManual").value)||""
+      bibleManual:($("#bibleManual")&&$("#bibleManual").value)||"",
+      helloaoLang:state.helloaoLang||"", helloaoTrans:state.helloaoTrans||""
     }));
   }catch(e){}
 }
@@ -678,8 +713,102 @@ const PRESETS=[
   {n:"복숭아 수채",t:"wash",c:["#fdf3ec","#f9e6da"],blob:["#f4b89a","#f6cdb5","#e89e7e"]},
   {n:"연보라 수채",t:"wash",c:["#f4eefb","#e8def5"],blob:["#c5aee0","#d8c6ee","#b196d2"]},
   {n:"크림 종이",t:"paper",bg:"#f6efe0",vig:.16},
-  {n:"양피지",t:"paper",bg:"#efe2c6",vig:.22}
+  {n:"양피지",t:"paper",bg:"#efe2c6",vig:.22},
+  // ── 사순절 10종 ──
+  {n:"사순절 자주",t:"lin",c:["#3a2454","#5e3e7a","#a08bb8"]},
+  {n:"재의 수요일",t:"lin",c:["#3a3038","#5a4a55","#8a7f87"]},
+  {n:"광야의 길",t:"scene",sky:["#7a6a78","#9a8a95","#cab8c0"],layers:[{y:.66,color:"#7a6a55",type:"hill",amp:.04},{y:.84,color:"#5a4a3f",type:"hill",amp:.04}]},
+  {n:"사순절 보라 광채",t:"rad",c:["#1f1230","#3a2452"],gl:"rgba(180,150,210,.6)",cy:.4},
+  {n:"고요한 묵상",t:"wash",c:["#e8e0ee","#d4c4dd"],blob:["#a08bb8","#8b76a6","#6f5a8e"]},
+  {n:"십자가의 길",t:"scene",sky:["#48304a","#7a5874","#bf9eb8"],sun:"#f5e2ee",sunGlow:"rgba(245,225,235,.6)",sunx:.5,suny:.36,sunr:.06,layers:[{y:.70,color:"#3a2638",type:"ridge",amp:.10,seg:6},{y:.86,color:"#1f1224",type:"ridge",amp:.10,seg:7}]},
+  {n:"보라 수채",t:"wash",c:["#f0e8f5","#dfd2ec"],blob:["#9d83bf","#bca0d7","#7e62a5"]},
+  {n:"잿빛 새벽",t:"lin",c:["#2a2530","#544a58","#9a8e9e"]},
+  {n:"보라 보케",t:"bok",c:["#241830","#3a244a"],dot:"rgba(190,160,220,.85)"},
+  {n:"광야 황혼",t:"scene",sky:["#a37090","#7a4a6e","#3a2447"],sun:"#f3d2dc",sunGlow:"rgba(243,210,220,.7)",sunx:.4,suny:.30,sunr:.06,layers:[{y:.72,color:"#3a2447",type:"hill",amp:.04}]},
+  // ── 고난주간 10종 ──
+  {n:"고난의 밤",t:"lin",c:["#1a0608","#3a0a12","#6b1820"]},
+  {n:"진홍 십자가",t:"lin",c:["#2a0608","#5a1018","#8a2030"]},
+  {n:"갈보리",t:"scene",sky:["#3a0a14","#5a1820","#8a3a3a"],layers:[{y:.66,color:"#2a0612",type:"ridge",amp:.12,seg:6},{y:.84,color:"#15030a",type:"ridge",amp:.10,seg:7}]},
+  {n:"가시면류관",t:"rad",c:["#10030a","#2a0a14"],gl:"rgba(200,80,80,.55)",cy:.4},
+  {n:"피의 빛",t:"ray",c:["#1a0608","#3a0c14"],ray:"#c84a44",cx:.5,cy:-.05},
+  {n:"어둠 가운데",t:"lin",c:["#0a0408","#1c1014","#3a2024"]},
+  {n:"슬픔의 보케",t:"bok",c:["#1a0408","#3a0c12"],dot:"rgba(180,60,70,.85)"},
+  {n:"피의 수채",t:"wash",c:["#1c0408","#2e080e"],blob:["#5a1014","#7a1c1c","#9c2828"]},
+  {n:"무덤의 빛",t:"rad",c:["#0a0408","#1c0a14"],gl:"rgba(180,140,150,.4)",cy:.6},
+  {n:"십자가 황혼",t:"scene",sky:["#3a0a14","#7a2424","#a4503a"],sun:"#e88e6e",sunGlow:"rgba(232,142,110,.7)",sunx:.5,suny:.32,sunr:.07,layers:[{y:.72,color:"#1c060c",type:"ridge",amp:.12,seg:6}]},
+  // ── 부활절 10종 ──
+  {n:"부활의 아침",t:"scene",sky:["#fff6dd","#fbe1a4","#ed9a78"],sun:"#fffce6",sunGlow:"rgba(255,250,210,.95)",sunx:.5,suny:.32,sunr:.10,layers:[{y:.70,color:"#a47a4a",type:"hill",amp:.04},{y:.86,color:"#6b4a2a",type:"hill",amp:.04}]},
+  {n:"빈 무덤의 빛",t:"ray",c:["#1a1408","#4a3618"],ray:"#fff3c8",cx:.5,cy:-.04},
+  {n:"승리의 광채",t:"rad",c:["#23304f","#3f5680"],gl:"rgba(255,242,180,.85)",cy:.32},
+  {n:"황금 부활",t:"lin",c:["#fff2c4","#f4c970","#b87832"]},
+  {n:"백합의 빛",t:"wash",c:["#fdfaee","#f6efd6"],blob:["#fff7d5","#f5e0a4","#d9b86c"]},
+  {n:"새벽 빛 광채",t:"rad",c:["#102b3a","#235870"],gl:"rgba(255,224,160,.85)",cy:.34},
+  {n:"부활 보케",t:"bok",c:["#1c1408","#3a2810"],dot:"rgba(255,232,160,.95)"},
+  {n:"하늘 문 열림",t:"ray",c:["#152442","#2f4a7a"],ray:"#fff4c8",cx:.5,cy:-.08},
+  {n:"빛의 들판",t:"scene",sky:["#fff7d5","#f8e0a0"],sun:"#fffce6",sunGlow:"rgba(255,250,210,.9)",sunx:.7,suny:.24,sunr:.08,layers:[{y:.66,color:"#a4b04a",type:"hill",amp:.05},{y:.82,color:"#7a8a3a",type:"hill",amp:.05}]},
+  {n:"부활 수채",t:"wash",c:["#fff7e6","#fbecc4"],blob:["#f5d27a","#fae7b1","#ecbb5c"]},
+  // ── 성령강림 10종 ──
+  {n:"오순절 불꽃",t:"lin",c:["#fff1c8","#f6a04a","#a72424"]},
+  {n:"불의 혀",t:"ray",c:["#3a0a08","#7a2014"],ray:"#ffb858",cx:.5,cy:-.05},
+  {n:"성령의 바람",t:"wash",c:["#fbe6cf","#f7c890"],blob:["#f08a40","#ec5d2a","#d23c1d"]},
+  {n:"붉은 광채",t:"rad",c:["#3a0608","#6a1410"],gl:"rgba(255,150,80,.85)",cy:.32},
+  {n:"불꽃 보케",t:"bok",c:["#2a0a08","#6a1810"],dot:"rgba(255,150,60,.95)"},
+  {n:"성령 강림",t:"scene",sky:["#fff5c8","#f6a872","#a72e2a"],sun:"#fff7c4",sunGlow:"rgba(255,225,150,.9)",sunx:.5,suny:.30,sunr:.09,layers:[{y:.74,color:"#5a1810",type:"ridge",amp:.10,seg:6}]},
+  {n:"화염의 길",t:"lin",c:["#1a0408","#a72824","#fbb24a"]},
+  {n:"붉은 노을 구름",t:"scene",sky:["#fff2b8","#f48c4a","#7a1a14"],clouds:{n:5,c:"rgba(255,220,160,.55)"}},
+  {n:"불빛 광채",t:"ray",c:["#48180a","#8a2814"],ray:"#ffd58a",cx:.42,cy:-.06},
+  {n:"성령의 광선",t:"rad",c:["#5a1408","#a02414"],gl:"rgba(255,210,140,.78)",cy:.34},
+  // ── 추수감사 10종 ──
+  {n:"추수의 들판",t:"scene",sky:["#fbe5b0","#f8c478","#c97a44"],sun:"#fff2cf",sunGlow:"rgba(255,228,170,.75)",sunx:.7,suny:.26,sunr:.07,layers:[{y:.62,color:"#e2a648",type:"hill",amp:.05},{y:.78,color:"#b07628",type:"hill",amp:.05},{y:.90,color:"#7a4a18",type:"hill",amp:.04}]},
+  {n:"황금 보리",t:"lin",c:["#fdedb0","#f1be5a","#a86d22"]},
+  {n:"단풍빛",t:"lin",c:["#fbe5c0","#d97a3c","#7a2818"]},
+  {n:"감사의 빛",t:"rad",c:["#2a1a08","#5a3818"],gl:"rgba(255,210,140,.85)",cy:.32},
+  {n:"호박빛",t:"wash",c:["#fdeac4","#f6cf8a"],blob:["#e69a44","#cb7728","#a85820"]},
+  {n:"추수 보케",t:"bok",c:["#2a1808","#5a3414"],dot:"rgba(255,210,140,.95)"},
+  {n:"가을 노을 길",t:"scene",sky:["#fbd9a0","#f0934e","#7a3a3a"],sun:"#ffeacf",sunGlow:"rgba(255,228,180,.85)",sunx:.4,suny:.34,sunr:.08,layers:[{y:.70,color:"#a05428",type:"hill",amp:.05}]},
+  {n:"풍성한 곳간",t:"lin",c:["#fcecc8","#e0a958","#6f4222"]},
+  {n:"가을 들녘",t:"scene",sky:["#f5e0b0","#e6c47a"],layers:[{y:.62,color:"#dba848",type:"hill",amp:.06},{y:.78,color:"#a07028",type:"hill",amp:.06},{y:.90,color:"#6f4a18",type:"hill",amp:.04}]},
+  {n:"단풍 숲",t:"scene",sky:["#fce4b8","#f7b870"],layers:[{y:.62,color:"#b85a28",type:"trees",amp:.12,seg:16},{y:.78,color:"#7a3a1c",type:"trees",amp:.13,seg:14},{y:.90,color:"#4a2410",type:"trees",amp:.10,seg:18}]},
+  // ── 대림절 10종 ──
+  {n:"대림 보라",t:"lin",c:["#1c1444","#3a2870","#7a60b0"]},
+  {n:"대림 촛불",t:"rad",c:["#0a0a28","#1c1448"],gl:"rgba(255,210,140,.78)",cy:.4},
+  {n:"기다림의 밤",t:"scene",sky:["#0a0a28","#1c1c50","#3a3878"],stars:160,layers:[{y:.82,color:"#0a081a",type:"ridge",amp:.07,seg:7}]},
+  {n:"대림 별빛",t:"bok",c:["#080a24","#181a3a"],dot:"rgba(255,250,210,.95)",sm:1},
+  {n:"새벽 별",t:"scene",sky:["#0a0e2a","#1c2854","#4a5a8a"],stars:120,sun:"#fff8d0",sunGlow:"rgba(255,238,180,.7)",sunx:.7,suny:.18,sunr:.04},
+  {n:"대림 빛 광채",t:"ray",c:["#0c1238","#1d2a64"],ray:"#fff0c8",cx:.5,cy:-.06},
+  {n:"보라 깊은 광채",t:"rad",c:["#1a1240","#321e62"],gl:"rgba(200,170,240,.75)",cy:.32},
+  {n:"대림 수채",t:"wash",c:["#e8e0f5","#cdc0e8"],blob:["#8870b8","#a796d3","#5e4a8e"]},
+  {n:"고요한 밤",t:"lin",c:["#0a1024","#1c2858","#5e6ea4"]},
+  {n:"별빛 가는 길",t:"scene",sky:["#0a1230","#1c2454","#3c4a82"],stars:140,layers:[{y:.78,color:"#0a0820",type:"hill",amp:.04}]},
+  // ── 성탄절 10종 ──
+  {n:"성탄 별",t:"scene",sky:["#0e1c3c","#1a3458","#3a5a8c"],stars:180,sun:"#fff7d0",sunGlow:"rgba(255,235,160,.85)",sunx:.5,suny:.20,sunr:.05},
+  {n:"눈 내리는 밤",t:"scene",sky:["#1a2848","#3a4a78","#a4b4d4"],stars:90,clouds:{n:6,c:"rgba(240,244,255,.6)"},layers:[{y:.86,color:"#dfe6f0",type:"hill",amp:.04}]},
+  {n:"성탄 황금",t:"lin",c:["#fff3c8","#f4c266","#b07820"]},
+  {n:"성탄 빨강 초록",t:"lin",c:["#9a1818","#6a2a2a","#1e5a3a"]},
+  {n:"성탄 촛불",t:"rad",c:["#1a0a18","#3a1828"],gl:"rgba(255,220,150,.85)",cy:.4},
+  {n:"눈송이 보케",t:"bok",c:["#0a1228","#1c2a4e"],dot:"rgba(255,255,255,.95)",sm:1},
+  {n:"호랑가시 잎",t:"wash",c:["#e8efe2","#d2deca"],blob:["#1e5a3a","#3a7a4a","#a52828"]},
+  {n:"성탄 광채",t:"ray",c:["#181838","#2a2a58"],ray:"#ffe8a8",cx:.5,cy:-.05},
+  {n:"베들레헴의 별",t:"scene",sky:["#0a1024","#1c204a","#3a4474"],stars:200,sun:"#fff5c0",sunGlow:"rgba(255,235,140,.9)",sunx:.5,suny:.22,sunr:.04,layers:[{y:.84,color:"#0a0814",type:"ridge",amp:.06,seg:7}]},
+  {n:"성탄 수채",t:"wash",c:["#fdf0ea","#f6dcd0"],blob:["#a52828","#3a7a4a","#d9a836"]}
 ];
+// 절기 카테고리 — 인덱스 범위로 분류 (PRESETS 추가 시 함께 갱신)
+const PRESET_CATS = [
+  {key:"all", label:"전체", from:0, to:120},
+  {key:"scene", label:"풍경", from:0, to:20},
+  {key:"pattern", label:"패턴", from:20, to:50},
+  {key:"lent", label:"사순절", from:50, to:60},
+  {key:"holyweek", label:"고난주간", from:60, to:70},
+  {key:"easter", label:"부활절", from:70, to:80},
+  {key:"pentecost", label:"성령강림", from:80, to:90},
+  {key:"thanksgiving", label:"추수감사", from:90, to:100},
+  {key:"advent", label:"대림절", from:100, to:110},
+  {key:"christmas", label:"성탄절", from:110, to:120}
+];
+function presetCatKey(idx){
+  for(const c of PRESET_CATS){ if(c.key!=="all" && idx>=c.from && idx<c.to) return c.key; }
+  return "all";
+}
 function paintPreset(g,W,H,p,idx){
   const rnd=mulberry32((idx+1)*9973);
   if(p.t==="scene"){ paintScenery(g,W,H,p,rnd); applyVignette(g,W,H,p.vig==null?0.20:p.vig); return; }
@@ -814,16 +943,39 @@ function paintSceneLayer(g,W,H,L,rnd){
   g.lineTo(W,baseY); g.lineTo(W,H); g.closePath(); g.fill();
 }
 function buildSampleGrid(){
-  const grid=$("#sampleGrid"); if(!grid||grid.childElementCount) return;
-  PRESETS.forEach((p,idx)=>{
-    const d=document.createElement("div"); d.className="thumb"; d.dataset.idx=idx;
-    const c=document.createElement("canvas"); c.width=180; c.height=234;
-    paintPreset(c.getContext("2d"),180,234,p,idx);
-    const lab=document.createElement("span"); lab.textContent=p.n;
-    d.appendChild(c); d.appendChild(lab);
-    d.onclick=()=>applyPreset(idx);
-    grid.appendChild(d);
+  const grid=$("#sampleGrid");
+  if(grid && !grid.childElementCount){
+    PRESETS.forEach((p,idx)=>{
+      const d=document.createElement("div"); d.className="thumb";
+      d.dataset.idx=idx; d.dataset.cat=presetCatKey(idx);
+      const c=document.createElement("canvas"); c.width=180; c.height=234;
+      paintPreset(c.getContext("2d"),180,234,p,idx);
+      const lab=document.createElement("span"); lab.textContent=p.n;
+      d.appendChild(c); d.appendChild(lab);
+      d.onclick=()=>applyPreset(idx);
+      grid.appendChild(d);
+    });
+  }
+  buildSampleCatChips();
+}
+function buildSampleCatChips(){
+  const wrap=$("#sampleCatChips"); if(!wrap||wrap.childElementCount) return;
+  PRESET_CATS.forEach((c,i)=>{
+    const s=document.createElement("span");
+    s.className="chip"+(i===0?" on":"");
+    s.textContent=c.label; s.dataset.cat=c.key;
+    s.onclick=()=>filterSampleCat(c.key);
+    wrap.appendChild(s);
   });
+}
+function filterSampleCat(key){
+  $$("#sampleCatChips .chip").forEach(c=>c.classList.toggle("on", c.dataset.cat===key));
+  const grid=$("#sampleGrid"); if(!grid) return;
+  $$("#sampleGrid .thumb").forEach(t=>{
+    t.style.display = (key==="all" || t.dataset.cat===key) ? "" : "none";
+  });
+  // 필터 후 그리드 상단으로 이동
+  try{ grid.scrollTo({top:0, behavior:"smooth"}); }catch(_){ grid.scrollTop=0; }
 }
 function markSample(idx){
   $$("#sampleGrid .thumb").forEach(t=>t.classList.toggle("on",+t.dataset.idx===idx));
@@ -916,12 +1068,25 @@ let BOOK_LIST=[
   {bk:63,ko:"요한이서",en:"2 john",aliases:["요이"]},{bk:64,ko:"요한삼서",en:"3 john",aliases:["요삼"]},
   {bk:65,ko:"유다서",en:"jude",aliases:["유"]},{bk:66,ko:"요한계시록",en:"revelation",aliases:["계","계시록"]}
 ];
-const VER_NAME={kor_rev:"개역개정",kor_easy:"쉬운성경",niv:"NIV",kor_hangul:"개역한글",web:"WEB",kjv:"KJV"};
+const VER_NAME={kor_rev:"개역개정",kor_easy:"쉬운성경",niv:"NIV",kor_hangul:"개역한글",web:"WEB",kjv:"KJV",helloao:"helloao"};
 // 퍼블릭 도메인 본문 캐시 (data/texts_kjv.json, data/texts_web.json) — 키:ref.en, 값:본문
 let TEXT_KJV = {};
 let TEXT_WEB = {};
 // 개역개정 본문 캐시 (data/kkbible-word200.json의 verses[].text) — 키:ref.en, 값:본문. 사용자가 개인 자료로 업로드.
 let TEXT_KOR_REV = {};
+// helloao (Free Use Bible API · https://bible.helloao.org) — 1004개 언어 · 1256개 번역
+const HELLOAO_BASE = "https://bible.helloao.org/api";
+let HELLOAO_TRANS = [];          // 전체 번역 목록 (lazy 로드)
+// 책 번호(1~66) → USFM 코드 매핑 (helloao API용)
+const BK_TO_USFM = {
+  1:"GEN",2:"EXO",3:"LEV",4:"NUM",5:"DEU",6:"JOS",7:"JDG",8:"RUT",9:"1SA",10:"2SA",
+  11:"1KI",12:"2KI",13:"1CH",14:"2CH",15:"EZR",16:"NEH",17:"EST",18:"JOB",19:"PSA",20:"PRO",
+  21:"ECC",22:"SNG",23:"ISA",24:"JER",25:"LAM",26:"EZK",27:"DAN",28:"HOS",29:"JOL",30:"AMO",
+  31:"OBA",32:"JON",33:"MIC",34:"NAM",35:"HAB",36:"ZEP",37:"HAG",38:"ZEC",39:"MAL",
+  40:"MAT",41:"MRK",42:"LUK",43:"JHN",44:"ACT",45:"ROM",46:"1CO",47:"2CO",48:"GAL",49:"EPH",
+  50:"PHP",51:"COL",52:"1TH",53:"2TH",54:"1TI",55:"2TI",56:"TIT",57:"PHM",58:"HEB",59:"JAS",
+  60:"1PE",61:"2PE",62:"1JN",63:"2JN",64:"3JN",65:"JUD",66:"REV"
+};
 
 // data/ 폴더의 JSON을 비동기로 로드해서 REFS/CATEGORIES/BOOK_LIST/TEXT_*를 풍부한 버전으로 교체
 async function loadBibleData(){
@@ -1009,6 +1174,84 @@ function parseManualRef(text){
   };
 }
 
+/* ---------- helloao (1000+ 언어 다국어 성경) ---------- */
+async function loadHelloaoTrans(){
+  if(HELLOAO_TRANS.length) return;
+  try{
+    const r=await fetch(`${HELLOAO_BASE}/available_translations.json`,{cache:"force-cache"});
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    const j=await r.json();
+    if(j && Array.isArray(j.translations)) HELLOAO_TRANS=j.translations;
+  }catch(e){ status("전 세계 번역 목록을 불러오지 못했습니다: "+e.message,"err"); }
+}
+function populateHelloaoLanguages(){
+  const sel=$("#helloaoLang"); if(!sel||!HELLOAO_TRANS.length) return;
+  // 언어별 그룹 — name: "English (51개)" 형태
+  const map=new Map();
+  HELLOAO_TRANS.forEach(t=>{
+    const code=t.language||"unknown";
+    const name=t.languageEnglishName||t.languageName||code;
+    if(!map.has(code)) map.set(code,{code,name,count:0});
+    map.get(code).count++;
+  });
+  const langs=[...map.values()].sort((a,b)=>a.name.localeCompare(b.name));
+  const cur=sel.value;
+  sel.innerHTML='<option value="">언어 선택…</option>';
+  langs.forEach(L=>{
+    const o=document.createElement("option"); o.value=L.code;
+    o.textContent=`${L.name} (${L.count})`;
+    sel.appendChild(o);
+  });
+  if(cur && sel.querySelector(`option[value="${cur}"]`)) sel.value=cur;
+}
+function populateHelloaoTranslations(){
+  const langSel=$("#helloaoLang"), trSel=$("#helloaoTrans");
+  if(!trSel) return;
+  const lang=langSel.value;
+  const cur=trSel.value;
+  trSel.innerHTML='<option value="">번역 선택…</option>';
+  if(!lang) return;
+  const list=HELLOAO_TRANS.filter(t=>(t.language||"")===lang).sort((a,b)=>(a.englishName||a.name||"").localeCompare(b.englishName||b.name||""));
+  list.forEach(t=>{
+    const o=document.createElement("option"); o.value=t.id;
+    o.textContent = (t.shortName? `[${t.shortName}] `:"") + (t.englishName||t.name||t.id);
+    trSel.appendChild(o);
+  });
+  if(cur && trSel.querySelector(`option[value="${cur}"]`)) trSel.value=cur;
+}
+function toggleHelloaoBox(){
+  const isHL = $("#bibleVer").value==="helloao";
+  $("#helloaoBox").style.display = isHL ? "block" : "none";
+  if(isHL && !HELLOAO_TRANS.length){
+    status('<span class="spin"></span>전 세계 번역 목록 불러오는 중…');
+    loadHelloaoTrans().then(()=>{
+      populateHelloaoLanguages();
+      if(state.helloaoLang){ $("#helloaoLang").value=state.helloaoLang; populateHelloaoTranslations(); if(state.helloaoTrans) $("#helloaoTrans").value=state.helloaoTrans; }
+      status(`${HELLOAO_TRANS.length}개 번역 준비 완료.`,"ok");
+    });
+  }
+}
+async function fetchHelloaoVerse(transId, ref){
+  const usfm=BK_TO_USFM[ref.bk];
+  if(!usfm) throw new Error("책 번호를 USFM으로 매핑 실패");
+  const url=`${HELLOAO_BASE}/${encodeURIComponent(transId)}/${usfm}/${ref.ch}.json`;
+  const r=await fetch(url);
+  if(!r.ok) throw new Error("HTTP "+r.status);
+  const j=await r.json();
+  const items=(j && j.chapter && Array.isArray(j.chapter.content)) ? j.chapter.content : [];
+  const verses=items.filter(x=>x && x.type==="verse" && +x.number>=ref.v1 && +x.number<=ref.v2);
+  if(!verses.length) throw new Error("절 범위에서 본문을 찾지 못함");
+  const text=verses.map(v=>{
+    if(!Array.isArray(v.content)) return "";
+    return v.content.map(c=>{
+      if(typeof c==="string") return c;
+      if(c && typeof c==="object") return c.text || (Array.isArray(c.content)?c.content.filter(x=>typeof x==="string").join(""):"");
+      return "";
+    }).join("");
+  }).join(" ").replace(/\s+/g," ").trim();
+  return text;
+}
+
 async function fetchVerseByRef(ref){
   const ver=$("#bibleVer").value;
   if(!ref) return;
@@ -1019,21 +1262,45 @@ async function fetchVerseByRef(ref){
     if(cached){
       $("#mainText").value = cached;
       $("#refText").value = tag;
+      hideDirectInput();
       showTab("text");
       status("구절을 불러왔습니다 (개역개정 · 로컬 본문).","ok");
       save(); render(); return;
     }
-    // 캐시에 없으면 기존 안내(참조만)
-    $("#refText").value=tag;
-    showTab("text");
-    status("이 구절은 개역개정 로컬 본문에 없습니다. 본문은 직접 붙여넣어 주세요. (참조는 자동 입력됨)","err");
-    $("#mainText").focus(); save(); render(); return;
+    // 캐시에 없으면 직접입력 박스 노출
+    showDirectInput(tag, ref);
+    status("개역개정 로컬 본문에 없습니다 — 본문을 직접 입력해 적용하세요.","err");
+    save(); render(); return;
   }
   if(ver==="kor_easy"||ver==="niv"){
-    $("#refText").value=tag;
-    showTab("text");
-    status(`${VER_NAME[ver]}은(는) 저작권 보호로 본문 자동 불러오기가 불가합니다. 성경에서 본문을 직접 붙여넣어 주세요. (참조는 자동 입력됨)`,"err");
-    $("#mainText").focus(); save(); render(); return;
+    showDirectInput(tag, ref);
+    status(`${VER_NAME[ver]} — 본문을 직접 입력해 적용하세요.`,"err");
+    save(); render(); return;
+  }
+  // helloao — 전 세계 1000+ 언어 다국어 성경
+  if(ver==="helloao"){
+    const transId = ($("#helloaoTrans") && $("#helloaoTrans").value) || state.helloaoTrans;
+    if(!transId){
+      status("전 세계 번역 — 언어와 번역본을 먼저 선택해 주세요.","err");
+      $("#refText").value=tag; save(); render(); return;
+    }
+    status('<span class="spin"></span>helloao 본문 불러오는 중…');
+    try{
+      const text = await fetchHelloaoVerse(transId, ref);
+      if(!text) throw new Error("본문이 비어 있습니다");
+      const tr = HELLOAO_TRANS.find(t=>t.id===transId);
+      const trLabel = tr ? (tr.shortName||tr.englishName||transId) : transId;
+      $("#mainText").value = text;
+      $("#refText").value = `${ref.label} (${trLabel})`;
+      showTab("text");
+      status(`구절을 불러왔습니다 (${trLabel}).`,"ok");
+      save(); render();
+    }catch(e){
+      $("#refText").value = tag;
+      status("helloao 본문 가져오기 실패: "+(e.message||"네트워크")+" — 다른 번역을 시도해 보세요.","err");
+      save(); render();
+    }
+    return;
   }
   // 퍼블릭 도메인 번역은 로컬 캐시(data/texts_*.json) 먼저 조회 → 오프라인에서도 즉시 채움
   if(ver==="kjv" || ver==="web"){
@@ -1094,12 +1361,58 @@ $("#bibleManual").addEventListener("keydown",e=>{
   if(e.key==="Enter"){ e.preventDefault(); $("#bibleManualFetch").click(); }
 });
 $("#bibleCat").onchange=()=>{ buildBibleRefs(); save(); };
-$("#bibleVer").onchange=save;
+$("#bibleVer").onchange=()=>{ toggleHelloaoBox(); hideDirectInput(); save(); };
+
+/* ---------- 본문 직접입력 박스 ---------- */
+let _directInputRef = null;  // 현재 직접입력 박스에 연결된 참조 태그
+function showDirectInput(tag, ref){
+  _directInputRef = tag;
+  $("#refText").value = tag;
+  $("#directInputRef").textContent = `· ${tag}`;
+  $("#directInputBox").style.display = "block";
+  // 박스로 스크롤 & 포커스
+  try{ $("#directInputBox").scrollIntoView({behavior:"smooth", block:"center"}); }catch(_){}
+  setTimeout(()=>$("#directInputText").focus(), 200);
+}
+function hideDirectInput(){
+  $("#directInputBox").style.display = "none";
+  _directInputRef = null;
+}
+$("#directInputApply").onclick=()=>{
+  const txt = ($("#directInputText").value||"").trim();
+  if(!txt){ status("본문을 입력해 주세요.","err"); $("#directInputText").focus(); return; }
+  $("#mainText").value = txt.replace(/\s+/g," ").trim();
+  if(_directInputRef) $("#refText").value = _directInputRef;
+  showTab("text");
+  status("본문을 적용했습니다.","ok");
+  save(); render();
+};
+$("#directInputClear").onclick=()=>{
+  $("#directInputText").value = "";
+  $("#directInputText").focus();
+};
 $("#bibleRef").onchange=save;
+$("#helloaoLang").onchange=()=>{ state.helloaoLang=$("#helloaoLang").value; state.helloaoTrans=""; populateHelloaoTranslations(); save(); };
+$("#helloaoTrans").onchange=()=>{ state.helloaoTrans=$("#helloaoTrans").value; save(); };
 
 /* ---------- 캐릭터 / 스티커 ---------- */
 const ANIMALS=["🐑","🐶","🐱","🐰","🐻","🐼","🦊","🐥","🐤","🐧","🦉","🦋","🐝","🐞","🐢","🐠","🐟","🐳","🐋","🦌","🐘","🦒","🐨","🦁","🐦","🐇","🦢","🐹"];
 const BIBLE_E=["🕊️","✝️","⛪","📖","📜","🙏","👼","🐑","🐟","🍞","🍇","🌿","🫒","🌈","⭐","🌟","✨","👑","⛵","🔥","💧","🕯️","☁️","🌅","🍯","🐪","🌾","🗝️"];
+const LENT_E=["🙏","✝️","💜","🕯️","🌵","🪨","📿","🥀","🌾","⛪"];
+const HOLYWEEK_E=["✝️","🌿","🍷","🍞","👑","🩸","🪔","🌑","⛓️","💔"];
+const EASTER_E=["🌅","🌷","🐑","🥚","🐣","✨","☀️","🕊️","🌸","🌟"];
+const PENTECOST_E=["🔥","🕊️","🌬️","❤️","✨","🎆","🌀","💨","🗣️","☄️"];
+const THANKSGIVING_E=["🌾","🍇","🍎","🎃","🍂","🍁","🌽","🥖","🦃","🙏"];
+const ADVENT_E=["🕯️","🎄","⭐","🌟","💜","🌌","🌜","🎁","📅","🙏"];
+const CHRISTMAS_E=["🎄","⭐","🌟","👼","🎁","❄️","☃️","🔔","🕯️","🐑"];
+const STICKER_GROUPS=[
+  [ANIMALS,"#animalChips"], [BIBLE_E,"#bibleChips"],
+  [LENT_E,"#lentChips"], [HOLYWEEK_E,"#holyweekChips"],
+  [EASTER_E,"#easterChips"], [PENTECOST_E,"#pentecostChips"],
+  [THANKSGIVING_E,"#thanksgivingChips"], [ADVENT_E,"#adventChips"],
+  [CHRISTMAS_E,"#christmasChips"]
+];
+const STICKER_SEL = STICKER_GROUPS.map(g=>g[1]+" .chip").join(", ");
 function buildDeco(){
   const mk=(arr,host)=>{
     const el=$(host); if(!el||el.childElementCount) return;
@@ -1110,13 +1423,13 @@ function buildDeco(){
       el.appendChild(s);
     });
   };
-  mk(ANIMALS,"#animalChips"); mk(BIBLE_E,"#bibleChips");
+  STICKER_GROUPS.forEach(([arr,host])=>mk(arr,host));
 }
 function syncDeco(){
   $("#stkSizeR").value=state.stkSize||14;
   $("#stkXR").value=state.stkX==null?50:state.stkX;
   $("#stkYR").value=state.stkY==null?80:state.stkY;
-  $$("#animalChips .chip, #bibleChips .chip").forEach(c=>c.classList.toggle("on",c.dataset.e===state.sticker));
+  $$(STICKER_SEL).forEach(c=>c.classList.toggle("on",c.dataset.e===state.sticker));
 }
 function setSticker(e){
   state.sticker=(state.sticker===e)?"":e;   // 같은 걸 다시 누르면 제거
